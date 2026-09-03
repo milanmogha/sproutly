@@ -87,9 +87,9 @@ export function MessagesScreen({
         }
       />
 
-      <div className={cn('grid gap-4', hasThreads && 'lg:grid-cols-[22rem_1fr]')}>
+      <div className={cn('grid min-w-0 gap-4', hasThreads && 'lg:grid-cols-[22rem_1fr]')}>
         {/* Thread list — hidden on phones once a conversation is open. */}
-        <div className={cn('space-y-2', openThread && 'hidden lg:block')}>
+        <div className={cn('min-w-0 space-y-2', openThread && 'hidden lg:block')}>
           {threads.isLoading ? (
             <ListSkeleton rows={4} />
           ) : threads.error ? (
@@ -121,7 +121,7 @@ export function MessagesScreen({
               >
                 <Avatar name={thread.name} id={thread.userId} size={42} />
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-center justify-between gap-2">
+                  <span className="flex min-w-0 items-center justify-between gap-2">
                     <span className="truncate font-display font-bold">{thread.name}</span>
                     <span className="shrink-0 text-[10px] font-bold text-[var(--color-text-muted)]">
                       {formatRelative(thread.lastAt)}
@@ -142,7 +142,7 @@ export function MessagesScreen({
         </div>
 
         {/* Conversation pane — only worth a column once there is one to open. */}
-        <div className={cn(!openThread && 'hidden', hasThreads && 'lg:block')}>
+        <div className={cn('min-w-0', !openThread && 'hidden', hasThreads && 'lg:block')}>
           {openThread ? (
             <Conversation
               userId={openThread}

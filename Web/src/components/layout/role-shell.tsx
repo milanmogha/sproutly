@@ -56,7 +56,7 @@ export function RoleShell({
   return (
     <div data-role={role} className="min-h-dvh">
       {/* ── Desktop sidebar ──────────────────────────────────────── */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-[var(--color-hairline)] bg-white md:flex">
+      <aside className="fixed top-0 left-0 z-30 hidden h-svh w-64 flex-col overflow-y-auto border-r border-[var(--color-hairline)] bg-white md:flex">
         <div className="px-5 py-6">
           <Logo size={32} />
           <p className="mt-3 text-xs font-bold tracking-wide text-accent uppercase">
