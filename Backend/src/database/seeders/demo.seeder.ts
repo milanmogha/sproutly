@@ -52,7 +52,6 @@ const dayAgo = (n: number): Date => {
   d.setDate(d.getDate() - n);
   return d;
 };
-const iso = (d: Date) => d.toISOString().slice(0, 10);
 const pick = <T>(list: T[], i: number): T => list[i % list.length];
 
 /** A seed document. Deliberately loose — the shapes are the schemas', not ours. */
@@ -269,10 +268,11 @@ async function bootstrap() {
       for (const [i, sid] of studentIds.entries()) {
         const roll = (d + i) % 11;
         attendance.push({
-          studentId: sid,
+          student: sid,
           classId: classes[kids[i].cls],
           date,
           status: roll === 0 ? 'absent' : roll === 1 ? 'late' : 'present',
+          markedBy: teacherIds[kids[i].cls],
           schoolId,
           ...base,
         });
@@ -309,7 +309,8 @@ async function bootstrap() {
         subject: h.subject,
         description: `${h.title}. Please help your child finish this at home.`,
         classId: pick(classes, i),
-        assignedBy: pick(teacherIds, i),
+        createdBy: pick(teacherIds, i),
+        assignedDate: dayAgo(i),
         dueDate: dayAgo(-(i + 1)),
         schoolId,
         ...base,
@@ -342,6 +343,7 @@ async function bootstrap() {
           score: 14 + ((i * 3 + j * 5) % 11),
           grade: pick(['A', 'B', 'A+', 'B+'], i + j),
           remarks: 'Steady progress this term.',
+          recordedBy: pick(teacherIds, i),
           schoolId,
           ...base,
         })),
@@ -351,9 +353,9 @@ async function bootstrap() {
     await col('milestones').insertMany(
       studentIds.slice(0, 5).flatMap((sid, i) =>
         [
-          { title: 'Holds a crayon correctly', domain: 'Motor skills', status: 'achieved' },
-          { title: 'Recognises own name in print', domain: 'Literacy', status: 'emerging' },
-          { title: 'Shares toys with peers', domain: 'Social', status: 'achieved' },
+          { title: 'Holds a crayon correctly', category: 'motor', status: 'achieved' },
+          { title: 'Recognises own name in print', category: 'language', status: 'emerging' },
+          { title: 'Shares toys with peers', category: 'social', status: 'achieved' },
         ].map((m, j) => ({
           ...m,
           student: sid,
@@ -368,7 +370,8 @@ async function bootstrap() {
     await col('teacherremarks').insertMany(
       studentIds.slice(0, 6).map((sid, i) => ({
         student: sid,
-        category: pick(['behavior', 'academic', 'general'], i),
+        category: pick(['behavior', 'academic', 'appreciation'], i),
+        date: dayAgo(i + 2),
         remark: pick(
           [
             'Settled in beautifully this week and is speaking up more in circle time.',
@@ -494,15 +497,18 @@ async function bootstrap() {
         const invoiceId = (
           await col('invoices').insertOne({
             invoiceNumber: `INV-DEMO-${100 + i * 3 + m}`,
-            studentId: sid,
-            feeStructureId: structureId,
+            student: sid,
+            classId: classes[kids[i].cls],
+            feeStructure: structureId,
+            period: `${year}-${String(((new Date().getMonth() - m + 12) % 12) + 1).padStart(2, '0')}`,
+            issuedAt: dayAgo(m * 30 + 5),
             lineItems: [
               { name: 'Tuition', amount: 4500 },
               { name: 'Activity fee', amount: 800 },
               { name: 'Snacks', amount: 700 },
             ],
             totalAmount: 6000,
-            paidAmount: paid ? 6000 : 0,
+            amountPaid: paid ? 6000 : 0,
             dueDate: dayAgo(m * 30 - 5),
             status: paid ? 'paid' : 'pending',
             academicYear,
@@ -512,14 +518,18 @@ async function bootstrap() {
         ).insertedId;
         if (paid) {
           const receiptNo = `RCPT-DEMO-${100 + i * 3 + m}`;
-          await col('payments').insertOne({
-            invoiceId, studentId: sid, amount: 6000,
-            method: pick(['upi', 'cash', 'card', 'online'], i + m),
-            paymentNumber: receiptNo, paidAt: dayAgo(m * 30), schoolId, ...base,
-          });
+          const paymentId = (
+            await col('payments').insertOne({
+              invoice: invoiceId, student: sid, amount: 6000,
+              method: pick(['upi', 'cash', 'card', 'online'], i + m),
+              paymentNumber: `PAY-DEMO-${100 + i * 3 + m}`,
+              receivedBy: pick(adminIds, i), paidAt: dayAgo(m * 30), schoolId, ...base,
+            })
+          ).insertedId;
           await col('receipts').insertOne({
-            receiptNumber: receiptNo, invoiceId, studentId: sid,
-            amount: 6000, issuedAt: dayAgo(m * 30), schoolId, ...base,
+            receiptNumber: receiptNo, payment: paymentId, invoice: invoiceId,
+            student: sid, amount: 6000, balanceAfter: 0,
+            issuedAt: dayAgo(m * 30), schoolId, ...base,
           });
         }
       }
@@ -569,14 +579,18 @@ async function bootstrap() {
 
     await col('ptmrequests').insertMany([
       {
-        studentId: studentIds[0], requestedBy: parentIds[0], teacherId: teacherIds[0],
+        student: studentIds[0], requestedBy: parentIds[0],
+        parent: parentIds[0], teacher: teacherIds[0],
         reason: 'Would like to discuss Aarav’s reading progress.',
+        preferredSlots: 'Weekday mornings',
         status: 'scheduled', scheduledAt: dayAgo(-3), schoolId, ...base,
       },
       {
-        studentId: studentIds[2], requestedBy: parentIds[1], teacherId: teacherIds[0],
+        student: studentIds[2], requestedBy: parentIds[1],
+        parent: parentIds[1], teacher: teacherIds[0],
         reason: 'General catch-up on how Kabir is settling in.',
-        status: 'pending', schoolId, ...base,
+        preferredSlots: 'Any afternoon',
+        status: 'requested', schoolId, ...base,
       },
     ]);
 
@@ -608,14 +622,17 @@ async function bootstrap() {
 
     await col('leaverequests').insertMany([
       {
-        studentId: studentIds[1], appliedBy: parentIds[0],
-        fromDate: dayAgo(-2), toDate: dayAgo(-1),
-        reason: 'Family wedding out of town.', status: 'pending', schoolId, ...base,
+        studentId: studentIds[1], applicantId: parentIds[0], applicantRole: 'parent',
+        type: 'casual', fromDate: dayAgo(-2), toDate: dayAgo(-1),
+        reason: 'Family wedding out of town.', status: 'pending',
+        isActive: true, schoolId, ...base,
       },
       {
-        studentId: studentIds[2], appliedBy: parentIds[1],
-        fromDate: dayAgo(6), toDate: dayAgo(5),
-        reason: 'Down with a cold.', status: 'approved', schoolId, ...base,
+        studentId: studentIds[2], applicantId: parentIds[1], applicantRole: 'parent',
+        type: 'sick', fromDate: dayAgo(6), toDate: dayAgo(5),
+        reason: 'Down with a cold.', status: 'approved',
+        reviewedBy: adminIds[0], reviewNote: 'Get well soon!',
+        isActive: true, schoolId, ...base,
       },
     ]);
 
@@ -677,12 +694,12 @@ async function bootstrap() {
         {
           recipient: pid, title: 'Fees received',
           body: 'Thank you — this month’s fees have been received.',
-          type: 'fees', read: false, schoolId, ...base,
+          type: 'fees', read: false, sentAt: dayAgo(1), schoolId, ...base,
         },
         {
           recipient: pid, title: 'New circular',
           body: 'Annual Day — 20th of next month.',
-          type: 'circular', read: true, schoolId, ...base,
+          type: 'circular', read: true, sentAt: dayAgo(2), schoolId, ...base,
         },
       ]),
     );
