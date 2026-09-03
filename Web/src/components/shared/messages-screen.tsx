@@ -10,13 +10,16 @@ import {
 import { errorMessage } from '@/lib/api/client';
 import {
   entityId,
+  messageSenderId,
   refDoc,
   refId,
   studentName,
   type ChatContact,
+  type Message,
   type Student,
 } from '@/lib/api/types';
 import { useAuth } from '@/lib/auth/auth-context';
+import { useChatSocket } from '@/lib/hooks/use-chat-socket';
 import type { Role } from '@/lib/auth/session';
 import {
   Avatar,
@@ -171,6 +174,25 @@ export function MessagesScreen({
   );
 }
 
+/** Day heading between message groups: Today, Yesterday, else the date. */
+function dayLabel(value?: string): string {
+  if (!value) return '';
+  const d = new Date(value);
+  const today = new Date();
+  const midnight = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const days = Math.round((midnight(today) - midnight(d)) / 86_400_000);
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  return d.toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    ...(d.getFullYear() === today.getFullYear() ? {} : { year: 'numeric' }),
+  });
+}
+
+const clockTime = (value?: string) =>
+  value ? new Date(value).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : '';
+
 function Conversation({
   userId,
   name,
@@ -188,24 +210,52 @@ function Conversation({
 }) {
   const [draft, setDraft] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
+  const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toast = useToast();
   const queryClient = useQueryClient();
 
   const messages = useQuery({
     queryKey: ['messages', 'conversation', userId],
     queryFn: () => communicationApi.conversation(userId),
-    refetchInterval: 20_000,
+    // The socket carries new messages; this is the fallback for a dropped
+    // connection, so it can be slow rather than chatty.
+    refetchInterval: 60_000,
   });
+
+  /* -- Realtime ------------------------------------------------------- */
+
+  const socket = useChatSocket({
+    userId: currentUserId,
+    peerId: userId,
+    onMessage: (incoming) => {
+      const from = messageSenderId(incoming);
+      const to = refId(incoming.recipient);
+      // Only the open conversation's traffic belongs in this list; anything
+      // else still refreshes the thread list so its badge and preview move.
+      if (from === userId || to === userId) {
+        queryClient.setQueryData<Message[]>(
+          ['messages', 'conversation', userId],
+          (current = []) =>
+            current.some((m) => entityId(m) === entityId(incoming))
+              ? current
+              : [...current, incoming],
+        );
+      }
+      void queryClient.invalidateQueries({ queryKey: ['messages', 'threads'] });
+    },
+  });
+
+  const online = socket.onlineUserIds.includes(userId);
 
   // Keep the newest message in view as the thread loads and grows.
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: 'end' });
-  }, [messages.data]);
+  }, [messages.data, socket.peerTyping]);
 
   // Anything unread in this thread is read the moment it's on screen.
   useEffect(() => {
     const unread = (messages.data ?? []).filter(
-      (message) => !message.read && refId(message.senderId) === userId,
+      (message) => !message.read && messageSenderId(message) === userId,
     );
     if (!unread.length) return;
     void Promise.all(
@@ -215,96 +265,186 @@ function Conversation({
 
   const send = useMutation({
     mutationFn: (body: string) => communicationApi.sendMessage({ recipientId: userId, body }),
-    onSuccess: () => {
+    onSuccess: (created) => {
       setDraft('');
-      void messages.refetch();
+      socket.sendTyping(userId, false);
+      // Show it straight away rather than waiting for a refetch; the socket
+      // echo is de-duplicated by id, so this cannot double up.
+      if (created) {
+        queryClient.setQueryData<Message[]>(
+          ['messages', 'conversation', userId],
+          (current = []) =>
+            current.some((m) => entityId(m) === entityId(created))
+              ? current
+              : [...current, created],
+        );
+      } else {
+        void messages.refetch();
+      }
       onSent();
     },
     onError: (error) => toast.error(errorMessage(error, 'Message not sent.')),
   });
 
-  function onSubmit(event: FormEvent) {
-    event.preventDefault();
+  function submit() {
     const body = draft.trim();
     if (body) send.mutate(body);
   }
 
+  function onDraftChange(value: string) {
+    setDraft(value);
+    socket.sendTyping(userId, value.trim().length > 0);
+    if (typingTimer.current) clearTimeout(typingTimer.current);
+    // Stop the indicator after a pause, so it does not stick while they think.
+    typingTimer.current = setTimeout(() => socket.sendTyping(userId, false), 2500);
+  }
+
+  const rows = messages.data ?? [];
+
   return (
-    <Card className="flex h-[70dvh] flex-col p-0 lg:h-[calc(100dvh-13rem)]">
-      <header className="flex items-center gap-3 border-b border-[var(--color-hairline)] px-4 py-3">
-        <IconButton label="Back to conversations" onClick={onBack} className="lg:hidden">
+    <Card className="flex h-[calc(100dvh-11rem)] flex-col overflow-hidden p-0 sm:h-[70dvh] lg:h-[calc(100dvh-13rem)]">
+      <header className="flex items-center gap-3 border-b border-[var(--color-hairline)] px-3 py-2.5 sm:px-4 sm:py-3">
+        <IconButton label="Back to conversations" onClick={onBack} className="-ml-1 lg:hidden">
           <ArrowLeft className="size-5" />
         </IconButton>
-        <Avatar name={name} id={userId} size={38} />
-        <div className="min-w-0">
-          <p className="truncate font-display font-bold">{name}</p>
-          {role && (
-            <p className="text-xs text-[var(--color-text-muted)]">{humanize(role)}</p>
+        <span className="relative shrink-0">
+          <Avatar name={name} id={userId} size={38} />
+          {online && (
+            <span
+              className="absolute right-0 bottom-0 size-3 rounded-full border-2 border-white bg-[var(--color-success)]"
+              aria-hidden
+            />
           )}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-display font-bold">{name}</p>
+          <p className="truncate text-xs text-[var(--color-text-muted)]">
+            {socket.peerTyping ? (
+              <span className="font-semibold text-accent">typing…</span>
+            ) : (
+              [role ? humanize(role) : null, online ? 'Online' : null].filter(Boolean).join(' · ')
+            )}
+          </p>
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-4">
-        {messages.isLoading ? (
-          <div className="grid h-full place-items-center">
-            <Spinner />
-          </div>
-        ) : !messages.data?.length ? (
-          <p className="py-10 text-center text-sm text-[var(--color-text-muted)]">
-            No messages yet — say hello.
-          </p>
-        ) : (
-          messages.data.map((message) => {
-            const mine = refId(message.senderId) === currentUserId;
-            return (
-              <div
-                key={entityId(message)}
-                className={cn('flex', mine ? 'justify-end' : 'justify-start')}
-              >
-                <div
-                  className={cn(
-                    'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm sm:max-w-[70%]',
-                    mine
-                      ? 'rounded-br-md bg-accent text-white'
-                      : 'rounded-bl-md bg-[var(--color-canvas)]',
+      {/* The scroller. justify-end keeps a short thread pinned to the composer
+          instead of stranding two bubbles at the top of a tall empty pane. */}
+      <div className="flex min-h-0 flex-1 flex-col justify-end overflow-y-auto bg-[var(--color-canvas)]/40">
+        <div className="flex flex-col px-3 py-4 sm:px-4">
+          {messages.isLoading ? (
+            <div className="grid place-items-center py-10">
+              <Spinner />
+            </div>
+          ) : !rows.length ? (
+            <p className="py-10 text-center text-sm text-[var(--color-text-muted)]">
+              No messages yet — say hello.
+            </p>
+          ) : (
+            rows.map((message, i) => {
+              const mine = messageSenderId(message) === currentUserId;
+              const previous = rows[i - 1];
+              const next = rows[i + 1];
+              const newDay = dayLabel(message.createdAt) !== dayLabel(previous?.createdAt);
+              // Runs from one person are grouped: only the last bubble in a run
+              // carries the tail and the timestamp, which is what stops a long
+              // exchange reading as a wall of identical blocks.
+              const sameAsPrevious =
+                !newDay && !!previous && messageSenderId(previous) === messageSenderId(message);
+              const endsRun =
+                !next ||
+                messageSenderId(next) !== messageSenderId(message) ||
+                dayLabel(next.createdAt) !== dayLabel(message.createdAt);
+
+              return (
+                <div key={entityId(message)}>
+                  {newDay && (
+                    <div className="my-3 flex justify-center">
+                      <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold text-[var(--color-text-muted)] shadow-sm">
+                        {dayLabel(message.createdAt)}
+                      </span>
+                    </div>
                   )}
-                >
-                  {message.subject && (
-                    <p className="mb-0.5 text-xs font-bold opacity-80">{message.subject}</p>
-                  )}
-                  <p className="leading-relaxed whitespace-pre-wrap">{message.body}</p>
-                  <p
+                  <div
                     className={cn(
-                      'mt-1 text-[10px] font-semibold',
-                      mine ? 'text-white/70' : 'text-[var(--color-text-muted)]',
+                      'flex',
+                      mine ? 'justify-end' : 'justify-start',
+                      sameAsPrevious ? 'mt-0.5' : 'mt-2',
                     )}
                   >
-                    {formatRelative(message.createdAt)}
-                  </p>
+                    <div
+                      className={cn(
+                        'max-w-[85%] rounded-2xl px-3.5 py-2 text-sm shadow-sm sm:max-w-[70%]',
+                        mine ? 'bg-accent text-white' : 'bg-white text-[var(--color-text)]',
+                        // Square off the corner nearest the speaker on the last
+                        // bubble of a run — the tail that shows who is talking.
+                        endsRun && (mine ? 'rounded-br-sm' : 'rounded-bl-sm'),
+                      )}
+                    >
+                      {message.subject && (
+                        <p className="mb-0.5 text-xs font-bold opacity-80">{message.subject}</p>
+                      )}
+                      <p className="leading-relaxed break-words whitespace-pre-wrap">
+                        {message.body}
+                      </p>
+                      {endsRun && (
+                        <p
+                          className={cn(
+                            'mt-1 text-right text-[10px] font-semibold',
+                            mine ? 'text-white/70' : 'text-[var(--color-text-muted)]',
+                          )}
+                        >
+                          {clockTime(message.createdAt)}
+                          {mine && (
+                            <span className="ml-1" title={message.read ? 'Read' : 'Sent'}>
+                              {message.read ? '✓✓' : '✓'}
+                            </span>
+                          )}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
+              );
+            })
+          )}
+
+          {socket.peerTyping && (
+            <div className="mt-2 flex justify-start">
+              <div className="flex gap-1 rounded-2xl rounded-bl-sm bg-white px-3.5 py-3 shadow-sm">
+                {[0, 150, 300].map((delay) => (
+                  <span
+                    key={delay}
+                    className="size-1.5 animate-bounce rounded-full bg-[var(--color-text-muted)]"
+                    style={{ animationDelay: `${delay}ms` }}
+                  />
+                ))}
               </div>
-            );
-          })
-        )}
-        <div ref={bottomRef} />
+            </div>
+          )}
+          <div ref={bottomRef} />
+        </div>
       </div>
 
       <form
-        onSubmit={onSubmit}
-        className="flex items-end gap-2 border-t border-[var(--color-hairline)] p-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          submit();
+        }}
+        className="flex items-end gap-2 border-t border-[var(--color-hairline)] bg-white p-2.5 sm:p-3"
       >
         <Textarea
           value={draft}
-          onChange={(e) => setDraft(e.target.value)}
+          onChange={(e) => onDraftChange(e.target.value)}
           placeholder="Write a message…"
           rows={1}
-          className="min-h-11 flex-1 resize-none"
+          className="max-h-32 min-h-11 flex-1 resize-none"
+          aria-label="Message"
           onKeyDown={(e) => {
             // Enter sends; Shift+Enter is a newline — what people expect.
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
-              const body = draft.trim();
-              if (body) send.mutate(body);
+              submit();
             }
           }}
         />
@@ -314,6 +454,7 @@ function Conversation({
           disabled={!draft.trim()}
           icon={<Send className="size-4" />}
           aria-label="Send"
+          className="shrink-0"
         >
           <span className="hidden sm:inline">Send</span>
         </Button>

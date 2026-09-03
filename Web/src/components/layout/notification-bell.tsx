@@ -91,7 +91,15 @@ export function NotificationBell({ role }: { role: Role }) {
         <div
           role="dialog"
           aria-label="Notifications"
-          className="absolute right-0 z-40 mt-2 flex max-h-[70dvh] w-[min(22rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[var(--radius-card)] bg-white shadow-[var(--shadow-sheet)]"
+          /*
+            On phones the bell is not the last thing in the header — a log-out
+            button sits to its right — so anchoring the panel to the bell with
+            `right-0` left it starting past the left edge of the screen, with
+            the heading cut in half. Below `md` it is positioned against the
+            viewport instead, inset from both sides so it always fits. From
+            `md` up the bell has room, and the anchored dropdown returns.
+          */
+          className="fixed inset-x-3 top-16 z-40 flex max-h-[70dvh] flex-col overflow-hidden rounded-[var(--radius-card)] bg-white shadow-[var(--shadow-sheet)] md:absolute md:inset-x-auto md:top-auto md:right-0 md:mt-2 md:w-[22rem]"
         >
           <header className="flex items-center justify-between gap-2 border-b border-[var(--color-hairline)] px-4 py-3">
             <h2 className="font-display font-bold">Notifications</h2>

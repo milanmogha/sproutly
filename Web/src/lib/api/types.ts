@@ -772,19 +772,34 @@ export interface Alert extends Entity {
   sentAt?: string;
 }
 
+/**
+ * One direct message.
+ *
+ * The API's fields are `sender` and `recipient`, populated with the account's
+ * name and role — not `senderId`/`recipientId`, and there are no flat
+ * `senderName`/`senderRole` keys. Reading the wrong one made every message
+ * look like it came from the other party, so a whole conversation rendered as
+ * one long incoming thread.
+ */
 export interface Message extends Entity {
-  senderId?: Ref<User>;
-  recipientId?: Ref<User>;
-  senderName?: string;
-  senderRole?: string;
-  recipientName?: string;
-  recipientRole?: string;
+  sender?: Ref<User>;
+  recipient?: Ref<User>;
   subject?: string;
   body: string;
   relatedStudent?: Ref<Student>;
-  relatedStudentName?: string;
   read?: boolean;
   readAt?: string;
+  createdAt?: string;
+}
+
+/** Who sent it, as a bare id. */
+export function messageSenderId(message: Message): string {
+  return refId(message.sender);
+}
+
+/** Whether this message was sent by the signed-in user. */
+export function isOwnMessage(message: Message, userId: string): boolean {
+  return !!userId && messageSenderId(message) === userId;
 }
 
 export interface ChatContact {
