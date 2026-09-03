@@ -315,12 +315,21 @@ export class AuthService {
 
     const length = this.config.get<number>('app.otpLength') ?? 6;
     const ttlMinutes = this.config.get<number>('app.otpTtlMinutes') ?? 5;
-    const code = this.generateNumericCode(length);
+    const demoCode = this.demoOtpFor(email);
+    const code = demoCode ?? this.generateNumericCode(length);
     const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000);
 
     // Store first: a code that reached the parent but was never persisted
     // would be rejected on verify, which is the worse way round to fail.
     await this.usersService.setOtp(String(user._id), this.hashCode(code), expiresAt);
+
+    // A demo account's code is the one the client was already given, so there
+    // is nothing to deliver — and mailing it to an address nobody owns would
+    // only bounce. Everything else about the login is unchanged.
+    if (demoCode) {
+      this.logger.log(`Demo OTP served for ${email} (no email sent)`);
+      return { sent: true };
+    }
 
     const delivered = await this.mail.sendOtp(email, code, ttlMinutes);
     if (!delivered) {
@@ -333,6 +342,22 @@ export class AuthService {
     }
 
     return { sent: true };
+  }
+
+  /**
+   * The fixed code for a demo parent, or null for everyone else.
+   *
+   * Returns null unless `DEMO_OTP` is configured *and* this exact address is
+   * listed in `DEMO_PARENT_EMAILS`. Both come from the environment, so a real
+   * parent cannot opt themselves in.
+   */
+  private demoOtpFor(email: string): string | null {
+    const code = this.config.get<string>('app.demoOtp') ?? '';
+    if (!code) {
+      return null;
+    }
+    const allowed = this.config.get<string[]>('app.demoParentEmails') ?? [];
+    return allowed.includes(email.trim().toLowerCase()) ? code : null;
   }
 
   /** Verifies a parent's one-time code and, on success, issues tokens. */

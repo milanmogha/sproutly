@@ -47,4 +47,27 @@ export default registerAs('app', () => ({
   otpLength: parseInt(process.env.OTP_LENGTH || '6', 10),
   otpTtlMinutes: parseInt(process.env.OTP_TTL_MINUTES || '5', 10),
   otpMaxAttempts: parseInt(process.env.OTP_MAX_ATTEMPTS || '5', 10),
+
+  /**
+   * Fixed login code for demo parent accounts, and the accounts allowed to use
+   * it. Both must be set or the feature does not exist.
+   *
+   * This is a deliberate backdoor for showing the product to a client without
+   * handing them a real inbox, so it is fenced in hard:
+   *
+   *  * `DEMO_OTP` unset (the default, and the case in any normal deployment)
+   *    disables it completely — there is no code to match.
+   *  * It applies only to addresses named in `DEMO_PARENT_EMAILS`. Membership
+   *    is decided by the server operator through the environment, never by
+   *    anything a caller can influence, so no real parent can fall into it by
+   *    registering a lookalike address.
+   *  * It changes only which code is stored and whether an email is sent. The
+   *    code is still hashed, still expires, and still burns through the same
+   *    attempt limit — it is not a bypass of the verify path.
+   */
+  demoOtp: process.env.DEMO_OTP || '',
+  demoParentEmails: (process.env.DEMO_PARENT_EMAILS || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean),
 }));

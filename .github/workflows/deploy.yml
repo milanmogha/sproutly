@@ -53,6 +53,17 @@ jobs:
           cd "$RELEASE"
           npm ci --omit=dev
 
+      - name: Seed the super admin
+        run: |
+          set -euo pipefail
+          cd "$DEPLOY_ROOT/backend/release"
+          # Idempotent — it logs "already exists" on every deploy after the
+          # first. It runs the compiled seeder, not `npm run seed`, because
+          # that one needs ts-node and the production install omits dev deps.
+          # Without this a fresh database has no account at all and nobody can
+          # sign in, which is a silent failure: the API is up and healthy.
+          node dist/database/seeders/super-admin.seeder.js 2>&1 | grep -iE "super admin|error" || true
+
       - name: Restart
         run: |
           set -euo pipefail
