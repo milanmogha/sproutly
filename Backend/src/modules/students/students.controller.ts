@@ -48,10 +48,21 @@ export class StudentsController {
     return this.studentsService.create(dto, user.schoolId);
   }
 
-  // Any authenticated user may read the roster (scoped to their own school).
+  /**
+   * The roster, scoped to the caller's school — and, for a parent, to their
+   * own child.
+   *
+   * A parent's `parentUserId` is forced here and cannot be overridden by the
+   * query: school scoping alone handed them every other family's children,
+   * complete with guardian phone numbers, addresses and medical notes.
+   */
   @Get()
   findAll(@Query() query: QueryStudentsDto, @CurrentUser() user: AuthUser) {
-    return this.studentsService.findAll(query, user.schoolId);
+    const scoped: QueryStudentsDto =
+      user.role === UserRole.PARENT
+        ? { ...query, parentUserId: user.userId }
+        : query;
+    return this.studentsService.findAll(scoped, user.schoolId);
   }
 
   @Get('stats')
@@ -61,7 +72,13 @@ export class StudentsController {
 
   @Get(':id')
   findOne(@Param('id') id: string, @CurrentUser() user: AuthUser) {
-    return this.studentsService.findOne(id, user.schoolId);
+    // Same rule as the list: a parent may fetch their own child and nobody
+    // else's, however they came by the id.
+    return this.studentsService.findOne(
+      id,
+      user.schoolId,
+      user.role === UserRole.PARENT ? user.userId : undefined,
+    );
   }
 
   // ── Parent self-service (scoped to the parent's own child) ──

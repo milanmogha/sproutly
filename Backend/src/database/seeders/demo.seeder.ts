@@ -191,10 +191,13 @@ async function bootstrap() {
 
     /* ── Students ────────────────────────────────────────────────────── */
 
+    // A parent account belongs to exactly one child. Siblings get their own
+    // account rather than sharing one, so nothing has to reason about which
+    // child a parent is currently "looking at".
     const kids = [
       { first: 'Aarav', last: 'Sharma', gender: 'male', cls: 0, parent: 0 },
-      { first: 'Diya', last: 'Sharma', gender: 'female', cls: 1, parent: 0 },
       { first: 'Kabir', last: 'Patel', gender: 'male', cls: 0, parent: 1 },
+      { first: 'Diya', last: 'Sharma', gender: 'female', cls: 1, parent: null },
       { first: 'Anaya', last: 'Iyer', gender: 'female', cls: 0, parent: null },
       { first: 'Vivaan', last: 'Rao', gender: 'male', cls: 1, parent: null },
       { first: 'Myra', last: 'Joshi', gender: 'female', cls: 1, parent: null },

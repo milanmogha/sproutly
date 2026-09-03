@@ -280,9 +280,31 @@ export class StudentsService {
     return { total, byStatus };
   }
 
-  async findOne(id: string, schoolId: string | null): Promise<Student> {
+  /**
+   * One child.
+   *
+   * `parentUserId` narrows the lookup to that parent's own child. It is part
+   * of the filter rather than a check afterwards, so a parent asking for
+   * somebody else's child gets the same "not found" as for an id that does not
+   * exist — the reply reveals nothing about who else is enrolled.
+   */
+  async findOne(
+    id: string,
+    schoolId: string | null,
+    parentUserId?: string,
+  ): Promise<Student> {
     const student = await this.studentModel
-      .findOne(scopeFilter({ _id: id }, schoolId))
+      .findOne(
+        scopeFilter(
+          {
+            _id: id,
+            ...(parentUserId
+              ? { parentUserId: new Types.ObjectId(parentUserId) }
+              : {}),
+          },
+          schoolId,
+        ),
+      )
       .exec();
     if (!student) {
       throw new NotFoundException('Student not found');
