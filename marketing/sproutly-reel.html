@@ -1,0 +1,1107 @@
+<title>Sproutly Launch Reel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+
+<style>
+/* ─────────────────────────────────────────────────────────
+   Page chrome — Duforge studio palette (warm white / ink / lime)
+   The reel inside it lives in Sproutly's own green world.
+   ───────────────────────────────────────────────────────── */
+:root{
+  --bg:#F6F5F2; --bg-2:#FBFAF8; --panel:#FFFFFF;
+  --line:#E6E3DC; --line-2:#D5D1C7;
+  --text:#16181C; --text-2:#3A3D44; --dim:#6B6F78;
+  --lime:#C8FF4D; --lime-ink:#4D7C0F; --lime-tint:#EEF8D9;
+  --ink:#12161C;
+  --shadow:0 18px 50px rgba(28,24,18,.12), 0 6px 16px rgba(28,24,18,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1014; --bg-2:#14171D; --panel:#171B21;
+    --line:#252A33; --line-2:#333944;
+    --text:#EDEFF2; --text-2:#C2C7D0; --dim:#8E949F;
+    --lime-ink:#A7E035; --lime-tint:#1E2716;
+    --shadow:0 18px 50px rgba(0,0,0,.5), 0 6px 16px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1014; --bg-2:#14171D; --panel:#171B21;
+  --line:#252A33; --line-2:#333944;
+  --text:#EDEFF2; --text-2:#C2C7D0; --dim:#8E949F;
+  --lime-ink:#A7E035; --lime-tint:#1E2716;
+  --shadow:0 18px 50px rgba(0,0,0,.5), 0 6px 16px rgba(0,0,0,.35);
+}
+
+@property --p{syntax:'<percentage>';inherits:false;initial-value:0%}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0;line-height:1.1;text-wrap:balance;letter-spacing:-.02em}
+p{margin:0}
+a{color:var(--lime-ink);text-decoration:none;font-weight:600}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--lime-ink);outline-offset:3px;border-radius:6px}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.eyebrow{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--lime-ink);font-weight:700}
+
+.masthead{padding:44px 0 22px}
+.masthead h1{font-family:'Fraunces',Georgia,serif;font-size:clamp(28px,4.4vw,42px);font-weight:600;margin:10px 0 8px}
+.masthead p{color:var(--dim);max-width:64ch;font-size:15px}
+
+/* ─────────────────────────────────────────────────────────
+   The reel stage — Sproutly green
+   ───────────────────────────────────────────────────────── */
+.stagewrap{margin:26px 0 0;display:flex;justify-content:center}
+.stage{
+  position:relative;overflow:hidden;
+  width:min(100%,680px);aspect-ratio:1/1;
+  border-radius:22px;background:#0A2412;
+  box-shadow:var(--shadow);isolation:isolate;
+}
+.stage[data-ratio="4:5"]{aspect-ratio:4/5;width:min(100%,560px)}
+.stage[data-ratio="9:16"]{aspect-ratio:9/16;width:min(100%,420px)}
+.stage[data-ratio="16:9"]{aspect-ratio:16/9;width:min(100%,960px)}
+
+.stage::before{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:radial-gradient(125% 115% at 50% 38%, #256B2C 0%, #14401C 46%, #0A2412 100%);
+}
+.stage::after{
+  content:"";position:absolute;inset:0;z-index:7;pointer-events:none;
+  background:radial-gradient(125% 105% at 50% 50%, transparent 56%, rgba(4,17,8,.62) 100%);
+}
+
+/* ── the ambient field, lifted straight from the app's splash ── */
+.ambient{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.bub{position:absolute;border-radius:50%;background:#388E3C}
+.bub.b1{width:22%;height:22%;top:6%;left:-5%;opacity:.34;animation:bubbleFloat 4s ease-in-out infinite}
+.bub.b2{width:30%;height:30%;top:16%;right:-8%;opacity:.26;animation:bubbleFloat 5s ease-in-out 1s infinite}
+.bub.b3{width:27%;height:27%;bottom:9%;left:-6%;opacity:.26;animation:bubbleFloat 4.5s ease-in-out .5s infinite}
+.bub.b4{width:19%;height:19%;bottom:4%;right:-4%;opacity:.3;animation:bubbleFloat 3.8s ease-in-out 1.5s infinite}
+.spk{position:absolute;border-radius:50%;background:#FF9800}
+.spk.s1{width:11px;height:11px;top:22%;left:13%;animation:sparkle 2s ease-in-out infinite}
+.spk.s2{width:9px;height:9px;top:35%;right:11%;animation:sparkle 2.5s ease-in-out .8s infinite}
+.spk.s3{width:7px;height:7px;bottom:28%;left:8%;animation:sparkle 2s ease-in-out 1.2s infinite}
+.spk.s4{width:10px;height:10px;bottom:22%;right:14%;animation:sparkle 2.2s ease-in-out .4s infinite}
+.spk.s5{width:6px;height:6px;top:14%;left:36%;background:#FFF9C4;animation:sparkle 3s ease-in-out .6s infinite}
+.spk.s6{width:8px;height:8px;bottom:33%;right:28%;background:#FFF9C4;animation:sparkle 2.8s ease-in-out 1s infinite}
+@keyframes bubbleFloat{
+  0%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(6px,-18px) scale(1.08)}
+  100%{transform:translate(0,0) scale(1)}
+}
+@keyframes sparkle{
+  0%,100%{opacity:.2;transform:scale(.8)}
+  50%{opacity:.7;transform:scale(1.2)}
+}
+@media (prefers-reduced-motion: reduce){
+  .bub,.spk{animation:none!important}
+}
+
+/* fixed 900×900 design frame, scaled to fit any ratio */
+.frame{
+  position:absolute;left:50%;top:50%;z-index:3;
+  width:900px;height:900px;margin:-450px 0 0 -450px;
+  transform:scale(var(--k,1));transform-origin:center center;
+
+  /* Sproutly's own tokens, straight from app_theme.dart */
+  --green:#2E7D32;
+  --green-deep:#1B5E20;
+  --green-light:#66BB6A;
+  --green-bright:#57C15A;
+  --mint:#00C9A7;
+  --leaf-a:#A5D6A7;
+  --leaf-b:#81C784;
+  --stem:#C8E6C9;
+  --orange:#FF9800;
+  --sunny:#FFB020;
+  --gold:#FFC21C;
+  --coral:#FF6B3D;   /* super admin */
+  --grape:#7C3AED;   /* parent */
+  --teal:#00BFA6;    /* teacher */
+  --sky:#38BDF8;
+  --danger:#FF3B6B;
+  --paper:#FFFFFF;
+  --paper-2:#E9F2E1;
+  --card-line:#E2E7DD;
+  --ink-txt:#1A201A;
+  --ink-dim:#6B756B;
+  --stage-txt:#F2F6EE;
+  --stage-dim:#A6C3A6;
+
+  color:var(--stage-txt);
+}
+
+.scene{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:26px;padding:56px;
+  opacity:0;visibility:hidden;
+  transition:opacity .55s ease, visibility 0s linear .55s;
+}
+.scene.is-on{opacity:1;visibility:visible;transition:opacity .55s ease}
+
+.rise,.pop{transition-delay:0s}
+.rise{opacity:0;transform:translateY(26px);transition:opacity .7s ease, transform .7s cubic-bezier(.2,.85,.25,1)}
+.is-on .rise{opacity:1;transform:none;transition-delay:var(--d,0s)}
+.pop{opacity:0;transform:scale(.9);transition:opacity .5s ease, transform .55s cubic-bezier(.2,1.2,.3,1)}
+.is-on .pop{opacity:1;transform:none;transition-delay:var(--d,0s)}
+@media (prefers-reduced-motion: reduce){ .rise,.pop{transform:none!important} }
+
+.line{
+  font-family:'Fraunces',Georgia,serif;font-weight:600;
+  font-size:62px;line-height:1.08;letter-spacing:-.025em;
+  text-align:center;max-width:16ch;
+  font-variation-settings:'SOFT' 60,'WONK' 1;
+}
+.line.sm{font-size:46px;max-width:20ch}
+.sub{font-size:23px;color:var(--stage-dim);text-align:center;max-width:36ch;font-weight:500}
+.kicker{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:14px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--sunny);font-weight:700;
+}
+.caption{
+  font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:38px;
+  letter-spacing:-.02em;text-align:center;max-width:23ch;
+  font-variation-settings:'SOFT' 60;
+}
+.caption em{font-style:normal;color:var(--gold)}
+.caption small{
+  display:block;margin-top:9px;
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:13px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--stage-dim);font-weight:700;
+}
+
+/* ── S1 ── */
+.mess{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;max-width:760px}
+.chip{
+  display:flex;align-items:center;gap:12px;padding:20px 26px;border-radius:18px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  font-size:22px;font-weight:600;color:#E4EFDF;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+.chip .dot{width:11px;height:11px;border-radius:50%;flex:none}
+.chip.a{transform:rotate(-3.5deg)} .is-on .chip.a{transform:rotate(-3.5deg)}
+.chip.b{transform:rotate(2deg)}    .is-on .chip.b{transform:rotate(2deg)}
+.chip.c{transform:rotate(-1.5deg)} .is-on .chip.c{transform:rotate(-1.5deg)}
+.chip.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:19px}
+
+/* ─────────────────────────────────────────────────────────
+   S2 · the sprout — the app's real splash, beat for beat
+   ───────────────────────────────────────────────────────── */
+.sproutbox{display:flex;flex-direction:column;align-items:center;gap:22px}
+.sprout{width:var(--sz,230px);height:auto;overflow:visible}
+.is-on .sprout{animation:float 3s ease-in-out 2.5s infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+.sprout .stem{
+  fill:none;stroke:var(--stem);stroke-width:4;stroke-linecap:round;
+  stroke-dasharray:110;stroke-dashoffset:110;
+}
+.is-on .sprout .stem{animation:draw .8s ease-out .3s both}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+.sprout .leaf{transform-box:fill-box;transform:scale(0);opacity:0}
+.sprout .leaf-r{transform-origin:left center}
+.sprout .leaf-l{transform-origin:right center}
+.is-on .sprout .leaf-r{animation:unfurl .5s ease-out 1.1s both}
+.is-on .sprout .leaf-l{animation:unfurl .5s ease-out 1.4s both}
+@keyframes unfurl{to{transform:scale(1);opacity:1}}
+
+.sprout .seed{transform-box:fill-box;transform-origin:center;transform:scale(0)}
+.is-on .sprout .seed{animation:popIn .4s ease-out 1.6s both}
+@keyframes popIn{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+.sprout .dirt{transform-box:fill-box;transform-origin:center;transform:scale(0)}
+.is-on .sprout .d1{animation:popIn .3s ease-out 2s both}
+.is-on .sprout .d2{animation:popIn .3s ease-out 2.1s both}
+.is-on .sprout .d3{animation:popIn .3s ease-out 2.2s both}
+
+@media (prefers-reduced-motion: reduce){
+  .is-on .sprout,.is-on .sprout *{animation:none!important}
+  .sprout .stem{stroke-dashoffset:0}
+  .sprout .leaf,.sprout .seed,.sprout .dirt{transform:none;opacity:1}
+}
+
+/* the wordmark, set the way the logo file sets it */
+.brand{
+  font-family:'Figtree',system-ui,sans-serif;
+  font-weight:500;font-size:76px;letter-spacing:-.02em;line-height:1;
+  color:#FFFFFF;
+}
+.tagline{
+  font-family:'Figtree',system-ui,sans-serif;
+  font-size:16px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--stem);font-weight:600;margin-top:10px;
+}
+
+/* ── device mockups ── */
+.phone{
+  width:308px;height:626px;flex:none;border-radius:38px;padding:11px;
+  background:linear-gradient(160deg,#3A5540,#1A2A1E);
+  box-shadow:0 34px 74px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.14);
+}
+.screen{width:100%;height:100%;border-radius:28px;overflow:hidden;background:var(--paper-2);color:var(--ink-txt);display:flex;flex-direction:column}
+.appbar{padding:15px 16px 13px;color:#fff;background:linear-gradient(135deg,var(--grape),#5B21B6);display:flex;align-items:center;gap:11px}
+.appbar.teach{background:linear-gradient(135deg,var(--teal),#04907E)}
+.av{width:36px;height:36px;border-radius:13px;background:rgba(255,255,255,.24);display:grid;place-items:center;font-weight:800;font-size:15px;flex:none}
+.appbar .who{font-size:15px;font-weight:700;line-height:1.25}
+.appbar .who span{display:block;font-size:11.5px;font-weight:500;opacity:.85}
+.appbar .bell{margin-left:auto;font-size:17px;opacity:.9}
+
+.body{padding:14px;display:flex;flex-direction:column;gap:11px;overflow:hidden}
+.sect{font-size:10.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-dim)}
+.card{background:var(--paper);border:1px solid var(--card-line);border-radius:20px;padding:13px}
+.attend{display:flex;align-items:center;gap:14px}
+.ring{
+  width:70px;height:70px;flex:none;border-radius:50%;
+  background:conic-gradient(var(--green) var(--p), #DCE8D6 0);
+  display:grid;place-items:center;
+  transition:--p 1.2s cubic-bezier(.2,.85,.25,1) .35s;
+}
+.ring i{width:54px;height:54px;border-radius:50%;background:var(--paper);display:grid;place-items:center;font-style:normal;font-size:16px;font-weight:800;color:var(--ink-txt)}
+.attend .t{font-size:15px;font-weight:700}
+.attend .s{font-size:12px;color:var(--ink-dim)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.tile{background:var(--paper);border:1px solid var(--card-line);border-radius:18px;padding:11px 12px}
+.tile .lb{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-dim)}
+.tile .vl{font-size:14.5px;font-weight:700;margin-top:3px}
+.tile .mt{font-size:11.5px;color:var(--ink-dim);margin-top:1px}
+.tile .ic{font-size:17px;line-height:1}
+
+.fee{border-radius:20px;padding:13px 14px;color:#fff;background:linear-gradient(120deg,var(--danger),#D31C55);display:flex;align-items:center;gap:12px}
+.fee .amt{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.fee .lb{font-size:11px;opacity:.9;font-weight:600}
+.fee .btn{margin-left:auto;background:rgba(255,255,255,.22);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700}
+
+.roster{display:flex;flex-direction:column;gap:7px}
+.stu{display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--card-line);border-radius:16px;padding:9px 11px}
+.stu .ini{width:29px;height:29px;border-radius:10px;background:#DCE8D6;display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--ink-dim);flex:none}
+.stu .nm{font-size:13.5px;font-weight:600}
+.stu .tag{margin-left:auto;font-size:11px;font-weight:800;border-radius:999px;padding:4px 11px;background:#E5EBE0;color:var(--ink-dim);transition:background .3s ease,color .3s ease}
+.is-on .stu .tag{background:#D3F5EE;color:#04756A;transition-delay:calc(.55s + var(--i)*.16s)}
+.is-on .stu.late .tag{background:#FFE9DC;color:#B44314}
+.tally{display:flex;align-items:center;gap:9px;background:var(--teal);color:#fff;border-radius:18px;padding:11px 13px}
+.tally .n{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.tally .x{font-size:12px;font-weight:600;opacity:.94;line-height:1.25}
+
+/* browser mockups */
+.browser{
+  width:760px;flex:none;border-radius:20px;overflow:hidden;
+  background:var(--paper-2);color:var(--ink-txt);
+  box-shadow:0 34px 74px rgba(0,0,0,.48), inset 0 0 0 1px rgba(255,255,255,.16);
+}
+.chrome{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#DDE8D6;border-bottom:1px solid var(--card-line)}
+.chrome .d{width:10px;height:10px;border-radius:50%}
+.chrome .url{margin-left:8px;background:var(--paper);border-radius:999px;padding:5px 14px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;color:var(--ink-dim)}
+.dash{padding:18px;display:flex;flex-direction:column;gap:14px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.kpi{background:var(--paper);border:1px solid var(--card-line);border-radius:18px;padding:13px 15px}
+.kpi .lb{font-size:10.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-dim)}
+.kpi .vl{font-size:26px;font-weight:800;margin-top:5px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi.good .vl{color:var(--green-deep)}
+.kpi.warn .vl{color:#C2410C}
+
+.chartcard{background:var(--paper);border:1px solid var(--card-line);border-radius:18px;padding:14px 16px 12px}
+.chartcard .hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.chartcard .hd b{font-size:14px}
+.chartcard .hd span{font-size:11.5px;color:var(--ink-dim);font-weight:600}
+.bars{display:flex;align-items:flex-end;gap:14px;height:112px}
+.bars div{flex:1;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,var(--green-bright),var(--green));height:5%;transition:height .85s cubic-bezier(.2,.9,.25,1)}
+.is-on .bars div{height:var(--h);transition-delay:calc(.45s + var(--i)*.09s)}
+.bars div:last-child{background:linear-gradient(180deg,var(--gold),#E09A05)}
+.xaxis{display:flex;gap:14px;margin-top:7px}
+.xaxis span{flex:1;text-align:center;font-size:10.5px;color:var(--ink-dim);font-weight:600}
+
+.toast{display:flex;align-items:center;gap:10px;background:#16351B;color:#CFE9D0;border-radius:16px;padding:11px 14px;font-size:13px;font-weight:600}
+.toast .tick{width:20px;height:20px;border-radius:50%;background:var(--green-bright);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.toast code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:#9BDC9F}
+
+.pipe{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap}
+.pipe .st{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:11px 22px;font-size:19px;font-weight:700;color:#EAF3E6}
+.pipe .ar{color:var(--gold);font-size:22px;font-weight:800}
+
+/* ── S6 · the platform console ── */
+.console{width:790px;flex:none}
+.tenants{display:flex;flex-direction:column;gap:9px;padding:16px 18px}
+.owner-row{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:18px;background:#DEEBD8;border:1px solid var(--card-line)}
+.owner-row .oi{width:30px;height:30px;border-radius:10px;background:var(--coral);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800;flex:none}
+.owner-row .on{font-size:14.5px;font-weight:800}
+.owner-row .os{font-size:11.5px;color:var(--ink-dim);font-weight:600}
+.owner-row .roll{margin-left:auto;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--ink-dim)}
+.owner-row .roll b{color:var(--green-deep)}
+.owner-row .roll i{color:#C2410C;font-style:normal}
+.tenant{display:flex;align-items:center;gap:11px;margin-left:26px;padding:11px 13px;border-radius:18px;background:var(--paper);border:1px solid var(--card-line)}
+.tenant .tn{font-size:13.5px;font-weight:700}
+.tenant .tl{font-size:11.5px;color:var(--ink-dim);font-weight:600}
+.tenant .st{margin-left:auto;font-size:11px;font-weight:800;border-radius:999px;padding:4px 11px}
+.tenant .st.ok{background:#DDF2DE;color:#1B5E20}
+.tenant .st.due{background:#FFE9DC;color:#B44314}
+.lockline{display:flex;align-items:center;gap:9px;margin:2px 18px 16px;background:#16351B;color:#CFE9D0;border-radius:16px;padding:11px 14px;font-size:12.5px;font-weight:600}
+.lockline code{font-family:'JetBrains Mono',ui-monospace,monospace;color:#9BDC9F;font-size:12px}
+
+/* ── close ── */
+.roles{display:flex;gap:11px;justify-content:center;flex-wrap:wrap}
+.role{border-radius:999px;padding:9px 19px;font-size:16.5px;font-weight:700;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06)}
+.role.p{color:#C4A6FF;border-color:rgba(196,166,255,.4)}
+.role.t{color:#5AE8D3;border-color:rgba(90,232,211,.4)}
+.role.a{color:#9BDC9F;border-color:rgba(155,220,159,.4)}
+.role.s{color:#FFA684;border-color:rgba(255,166,132,.4)}
+.byline{display:flex;align-items:center;gap:11px;background:#12161C;border-radius:16px;padding:11px 18px}
+.byline svg{width:26px;height:26px;flex:none}
+.byline .nm{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:19px;font-weight:700;color:#F2F0EB;letter-spacing:-.02em}
+.byline .sep{width:1px;height:20px;background:#2C323C}
+.byline .tx{font-size:14px;color:#9AA0AA;font-weight:600}
+
+/* ── controls ── */
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:center;margin:20px 0 0}
+.btnc{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--line-2);background:var(--panel);color:var(--text);
+  border-radius:999px;padding:9px 18px;font:inherit;font-size:14px;font-weight:700;
+  cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease;
+}
+.btnc:hover{transform:translateY(-2px);border-color:var(--text)}
+.btnc.primary{background:var(--lime);border-color:transparent;color:var(--ink);box-shadow:0 8px 24px rgba(160,200,50,.28)}
+.btnc.primary:hover{background:#B7EF34}
+.segs{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden;background:var(--panel)}
+.segs button{border:0;background:transparent;color:var(--dim);font:inherit;font-size:13px;font-weight:700;padding:9px 15px;cursor:pointer;font-family:'JetBrains Mono',ui-monospace,monospace}
+.segs button[aria-pressed="true"]{background:var(--lime-tint);color:var(--lime-ink)}
+.track{margin:16px auto 0;max-width:680px;height:4px;border-radius:99px;background:var(--line);overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--lime-ink);border-radius:99px}
+.timer{text-align:center;margin-top:8px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--dim);letter-spacing:.08em}
+.status{
+  text-align:center;margin:14px auto 0;max-width:64ch;font-size:13.5px;color:var(--dim);
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 16px;
+}
+.status strong{color:var(--text)}
+.status em{color:var(--text);font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px}
+.status.busy{border-color:var(--lime-ink);color:var(--text)}
+.status.bad{border-color:#C2410C;color:#9A3412}
+body.rec .status{display:none}
+
+body.rec{background:#031107;overflow:hidden}
+body.rec .hide-rec{display:none}
+body.rec .stagewrap{position:fixed;inset:0;padding:0;margin:0;display:grid;place-items:center}
+body.rec .stage{border-radius:0;box-shadow:none;width:min(100vw,calc(100vh * var(--ar,1)));height:auto}
+body.rec .escnote{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#1E3524;letter-spacing:.14em;z-index:9}
+.escnote{display:none}
+
+/* ── sections ── */
+.section{padding:56px 0 0}
+.section h2{font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:600;margin:8px 0 6px}
+.section .note{color:var(--dim);font-size:15px;max-width:66ch}
+
+.postcard{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.postcard .hd{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+.postcard .hd .who{font-size:14px;font-weight:800}
+.postcard .hd .who span{display:block;font-size:12px;font-weight:500;color:var(--dim)}
+.postcard .hd .li{width:34px;height:34px;border-radius:8px;background:#0A66C2;color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px;flex:none}
+.postcard .hd .btnc{margin-left:auto}
+.posttext{padding:22px 24px 26px;margin:0;font-size:15.5px;line-height:1.62;color:var(--text-2);white-space:pre-wrap;word-wrap:break-word}
+.counthint{padding:0 24px 20px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;color:var(--dim);letter-spacing:.06em}
+
+.alts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:20px}
+.alt{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.alt .tag{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--lime-ink);font-weight:700}
+.alt p{margin-top:9px;font-size:15px;color:var(--text-2)}
+
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:20px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.step .n{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--lime-ink);letter-spacing:.1em}
+.step h3{font-size:16px;margin:8px 0 6px}
+.step p{font-size:14px;color:var(--dim)}
+.step kbd{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;background:var(--lime-tint);color:var(--lime-ink);border-radius:5px;padding:2px 6px;font-weight:700}
+
+.shotlist{margin-top:20px;overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:700}
+td:first-child{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;color:var(--lime-ink);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+td b{color:var(--text)}
+td span{color:var(--dim)}
+
+footer{padding:56px 0 64px;color:var(--dim);font-size:13.5px}
+</style>
+
+<div class="page">
+
+  <header class="masthead wrap hide-rec">
+    <span class="eyebrow">Sproutly · launch reel</span>
+    <h1>A 36-second ad for your own preschool platform.</h1>
+    <p>Press play, switch to the aspect ratio you're posting in, then hit <strong>Record mode</strong> and capture the screen. The LinkedIn copy is below the reel, ready to paste.</p>
+  </header>
+
+  <div class="stagewrap">
+    <div class="stage" id="stage" data-ratio="1:1">
+
+      <!-- the app's own splash field, running under every scene -->
+      <div class="ambient" aria-hidden="true">
+        <span class="bub b1"></span><span class="bub b2"></span>
+        <span class="bub b3"></span><span class="bub b4"></span>
+        <span class="spk s1"></span><span class="spk s2"></span><span class="spk s3"></span>
+        <span class="spk s4"></span><span class="spk s5"></span><span class="spk s6"></span>
+      </div>
+
+      <div class="frame" id="frame">
+
+        <!-- ── S0 · the hook ─────────────────────────────── -->
+        <div class="scene" data-s="0">
+          <span class="kicker rise" style="--d:.1s">8:14 PM</span>
+          <p class="line rise" style="--d:.28s">A parent wants last month's fee receipt.</p>
+          <p class="sub rise" style="--d:.75s">Where does the school look first?</p>
+        </div>
+
+        <!-- ── S1 · three places, none agree ─────────────── -->
+        <div class="scene" data-s="1">
+          <div class="mess">
+            <span class="chip a pop" style="--d:.05s"><i class="dot" style="background:#25D366"></i>The WhatsApp group</span>
+            <span class="chip b pop" style="--d:.2s"><i class="dot" style="background:#FF9800"></i>The paper register</span>
+            <span class="chip c mono pop" style="--d:.35s"><i class="dot" style="background:#1D6F42"></i>fees_final_v3.xlsx</span>
+          </div>
+          <p class="line sm rise" style="--d:.7s">Three places. None of them agree.</p>
+        </div>
+
+        <!-- ── S2 · the sprout grows (the real splash) ───── -->
+        <div class="scene" data-s="2">
+          <div class="sproutbox">
+            <svg class="sprout" style="--sz:236px" viewBox="-44 -26 104 158" role="img" aria-label="Sproutly">
+              <path class="stem" d="M0,100 Q0,65 0,45 Q0,22 14,8" pathLength="110"/>
+              <g transform="rotate(-35,28,2)">
+                <ellipse class="leaf leaf-r" cx="28" cy="2" rx="24" ry="14" fill="#A5D6A7"/>
+              </g>
+              <g transform="rotate(30,-8,34)">
+                <ellipse class="leaf leaf-l" cx="-8" cy="34" rx="20" ry="12" fill="#81C784"/>
+              </g>
+              <circle class="seed" cx="28" cy="-8" r="7" fill="#FF9800"/>
+              <circle class="dirt d1" cx="-2" cy="112" r="5"   fill="#C8E6C9" opacity=".5"/>
+              <circle class="dirt d2" cx="10" cy="120" r="3.5" fill="#C8E6C9" opacity=".35"/>
+              <circle class="dirt d3" cx="-12" cy="118" r="3.5" fill="#C8E6C9" opacity=".4"/>
+            </svg>
+            <div>
+              <p class="brand rise" style="--d:1.8s">sproutly</p>
+              <p class="tagline rise" style="--d:2.1s">Preschool management</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── S3 · the parent ───────────────────────────── -->
+        <div class="scene" data-s="3">
+          <p class="caption rise" style="--d:.05s">Parents see the day <em>as it happens</em>.</p>
+          <div class="phone rise" style="--d:.2s">
+            <div class="screen">
+              <div class="appbar">
+                <span class="av">A</span>
+                <span class="who">Aarav Sharma<span>Nursery B · Little Stars, Kothrud</span></span>
+                <span class="bell">&#9679;</span>
+              </div>
+              <div class="body">
+                <span class="sect">This month</span>
+                <div class="card attend">
+                  <span class="ring" id="ring"><i>96%</i></span>
+                  <span>
+                    <span class="t" style="display:block">Present 24 of 25 days</span>
+                    <span class="s">Checked in 8:52 AM · out 12:30 PM</span>
+                  </span>
+                </div>
+                <span class="sect">Today at school</span>
+                <div class="grid2">
+                  <div class="tile"><div class="ic">&#127858;</div><div class="lb">Meal</div><div class="vl">Finished lunch</div><div class="mt">Dal, rice, curd</div></div>
+                  <div class="tile"><div class="ic">&#128564;</div><div class="lb">Nap</div><div class="vl">1 h 40 m</div><div class="mt">11:10 – 12:50</div></div>
+                  <div class="tile"><div class="ic">&#128522;</div><div class="lb">Mood</div><div class="vl">Cheerful</div><div class="mt">Shared his blocks</div></div>
+                  <div class="tile"><div class="ic">&#129657;</div><div class="lb">Health</div><div class="vl">All good</div><div class="mt">No medication</div></div>
+                </div>
+                <div class="fee">
+                  <span>
+                    <span class="lb">Fees due</span>
+                    <span class="amt" style="display:block">&#8377;18,000</span>
+                  </span>
+                  <span class="btn">View</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── S4 · the teacher ──────────────────────────── -->
+        <div class="scene" data-s="4">
+          <p class="caption rise" style="--d:.05s">Teachers mark the register <em>before assembly ends</em>.</p>
+          <div class="phone rise" style="--d:.2s">
+            <div class="screen">
+              <div class="appbar teach">
+                <span class="av">PK</span>
+                <span class="who">Nursery B · Attendance<span>Mon, 1 Sep · Priya Kulkarni</span></span>
+              </div>
+              <div class="body">
+                <div class="tally">
+                  <span class="n" id="tally">0</span>
+                  <span class="x">of 25 marked<br>2 absent · 1 late arrival</span>
+                </div>
+                <div class="roster">
+                  <div class="stu" style="--i:0"><span class="ini">AS</span><span class="nm">Aarav Sharma</span><span class="tag">Present</span></div>
+                  <div class="stu" style="--i:1"><span class="ini">DI</span><span class="nm">Diya Iyer</span><span class="tag">Present</span></div>
+                  <div class="stu late" style="--i:2"><span class="ini">KR</span><span class="nm">Kabir Rao</span><span class="tag">Late 9:20</span></div>
+                  <div class="stu" style="--i:3"><span class="ini">MN</span><span class="nm">Meera Nair</span><span class="tag">Present</span></div>
+                  <div class="stu" style="--i:4"><span class="ini">VG</span><span class="nm">Vihaan Gupta</span><span class="tag">Present</span></div>
+                  <div class="stu" style="--i:5"><span class="ini">SD</span><span class="nm">Sara D'Souza</span><span class="tag">Present</span></div>
+                  <div class="stu" style="--i:6"><span class="ini">RP</span><span class="nm">Reyansh Patil</span><span class="tag">Present</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── S5 · the school office ────────────────────── -->
+        <div class="scene" data-s="5">
+          <p class="caption rise" style="--d:.05s">The office closes the month <em>without a spreadsheet</em>.</p>
+          <div class="browser rise" style="--d:.2s">
+            <div class="chrome">
+              <i class="d" style="background:#FF5F57"></i><i class="d" style="background:#FEBC2E"></i><i class="d" style="background:#28C840"></i>
+              <span class="url">sproutly &nbsp;·&nbsp; fees</span>
+            </div>
+            <div class="dash">
+              <div class="kpis">
+                <div class="kpi good"><div class="lb">Collected · Aug</div><div class="vl" id="k1">&#8377;0</div></div>
+                <div class="kpi warn"><div class="lb">Outstanding</div><div class="vl" id="k2">&#8377;0</div></div>
+                <div class="kpi"><div class="lb">Students</div><div class="vl" id="k3">0</div></div>
+              </div>
+              <div class="chartcard">
+                <div class="hd"><b>Fee collection</b><span>Apr – Sep 2026</span></div>
+                <div class="bars">
+                  <div style="--h:52%;--i:0"></div><div style="--h:64%;--i:1"></div>
+                  <div style="--h:58%;--i:2"></div><div style="--h:76%;--i:3"></div>
+                  <div style="--h:83%;--i:4"></div><div style="--h:96%;--i:5"></div>
+                </div>
+                <div class="xaxis"><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span></div>
+              </div>
+              <div class="toast">
+                <span class="tick">&#10003;</span>
+                <span>142 invoices generated for Nursery &amp; Jr KG · 0 duplicates · <code>INV-2026-00001</code></span>
+              </div>
+            </div>
+          </div>
+          <div class="pipe rise" style="--d:1.5s">
+            <span class="st">Structure</span><span class="ar">&#8594;</span>
+            <span class="st">Invoices</span><span class="ar">&#8594;</span>
+            <span class="st">Payment</span><span class="ar">&#8594;</span>
+            <span class="st">Receipt</span>
+          </div>
+        </div>
+
+        <!-- ── S6 · the platform console ─────────────────── -->
+        <div class="scene" data-s="6">
+          <p class="caption rise" style="--d:.05s">And behind all of it, <em>one console</em>.<small>Ours — never a school's</small></p>
+          <div class="browser console rise" style="--d:.25s">
+            <div class="chrome">
+              <i class="d" style="background:#FF5F57"></i><i class="d" style="background:#FEBC2E"></i><i class="d" style="background:#28C840"></i>
+              <span class="url">sproutly &nbsp;·&nbsp; owners</span>
+            </div>
+            <div class="tenants">
+              <div class="owner-row">
+                <span class="oi">ST</span>
+                <span>
+                  <span class="on" style="display:block">Sharma Educational Trust</span>
+                  <span class="os">Customer · 3 branches</span>
+                </span>
+                <span class="roll"><b>2 active</b> · <i>1 expiring</i></span>
+              </div>
+              <div class="tenant">
+                <span><span class="tn" style="display:block">Little Stars Preschool</span><span class="tl">Kothrud · 86 students</span></span>
+                <span class="st ok">Active · 214 days</span>
+              </div>
+              <div class="tenant">
+                <span><span class="tn" style="display:block">Little Stars Preschool</span><span class="tl">Baner · 64 students</span></span>
+                <span class="st ok">Active · 96 days</span>
+              </div>
+              <div class="tenant">
+                <span><span class="tn" style="display:block">Bright Beginnings</span><span class="tl">Wakad · 41 students</span></span>
+                <span class="st due">Expiring · 6 days</span>
+              </div>
+            </div>
+            <div class="lockline">
+              <span>Separate logins, separate data, separate subscriptions — <code>scopeFilter</code> is keyed on the school, so no branch can read a sibling's records.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── S7 · the close ────────────────────────────── -->
+        <div class="scene" data-s="7">
+          <svg class="sprout pop" style="--sz:118px;--d:.05s" viewBox="-44 -26 104 158" role="img" aria-label="Sproutly">
+            <path class="stem" d="M0,100 Q0,65 0,45 Q0,22 14,8" pathLength="110"/>
+            <g transform="rotate(-35,28,2)"><ellipse class="leaf leaf-r" cx="28" cy="2" rx="24" ry="14" fill="#A5D6A7"/></g>
+            <g transform="rotate(30,-8,34)"><ellipse class="leaf leaf-l" cx="-8" cy="34" rx="20" ry="12" fill="#81C784"/></g>
+            <circle class="seed" cx="28" cy="-8" r="7" fill="#FF9800"/>
+          </svg>
+          <div>
+            <p class="brand rise" style="--d:.35s;font-size:62px">sproutly</p>
+            <p class="tagline rise" style="--d:.5s">Preschool management</p>
+          </div>
+          <div class="roles rise" style="--d:.68s">
+            <span class="role p">Parent</span>
+            <span class="role t">Teacher</span>
+            <span class="role a">School office</span>
+            <span class="role s">Platform console</span>
+          </div>
+          <div class="byline rise" style="--d:.88s">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <rect width="100" height="100" rx="24" fill="#12161C"/>
+              <path d="M32 34 50 50 32 66" fill="none" stroke="#F2F0EB" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="56" y="59" width="20" height="7.5" rx="3.75" fill="#C8FF4D"/>
+            </svg>
+            <span class="nm">Duforge</span>
+            <span class="sep"></span>
+            <span class="tx">Built it. Runs it.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <p class="escnote">RECORD MODE — PRESS ESC TO EXIT · SPACE TO REPLAY</p>
+
+  <div class="wrap hide-rec">
+    <div class="bar">
+      <button class="btnc primary" id="play">&#9654;&nbsp; Play the reel</button>
+      <span class="segs" role="group" aria-label="Aspect ratio">
+        <button data-r="1:1" aria-pressed="true">1:1</button>
+        <button data-r="4:5" aria-pressed="false">4:5</button>
+        <button data-r="9:16" aria-pressed="false">9:16</button>
+        <button data-r="16:9" aria-pressed="false">16:9</button>
+      </span>
+      <button class="btnc" id="record">&#9679;&nbsp; Record mode</button>
+      <button class="btnc primary" id="save">&#11015;&nbsp; Record &amp; save video</button>
+    </div>
+    <div class="track"><i id="prog"></i></div>
+    <p class="timer" id="timer">0.0s / 36.0s · SCENE —</p>
+    <p class="status" id="status">Click <strong>Record &amp; save video</strong>, choose <strong>This tab</strong> in the picker, then leave the window alone for 37 seconds. The file downloads on its own.</p>
+  </div>
+
+  <!-- ── the post ─────────────────────────────────────── -->
+  <section class="section wrap hide-rec">
+    <span class="eyebrow">Ready to paste</span>
+    <h2>The LinkedIn post</h2>
+    <p class="note">A launch post for a product that's yours — no client to clear it with. The first two lines are what shows before "…more", so they carry the hook alone.</p>
+
+    <div class="postcard">
+      <div class="hd">
+        <span class="li">in</span>
+        <span class="who">Milan Mogha<span>Founder, Duforge · We forge software</span></span>
+        <button class="btnc" id="copy">Copy post</button>
+      </div>
+      <p class="posttext" id="posttext">It's 8:14 PM and a parent wants last month's fee receipt.
+
+The school checks the WhatsApp group. Then the paper register. Then fees_final_v3.xlsx. Three places, and none of them agree.
+
+So we built the thing that replaces all three. It's called Sproutly.
+
+One app, four surfaces, built and run by us at Duforge:
+
+→ Parents see the day as it happens — meals, nap, mood, health, attendance, photos. Nobody has to ask at pickup.
+
+→ Teachers mark the register, write the daily diary and raise a PTM request from their phone, between classes.
+
+→ The school office runs admissions, staff, communication and fees end to end: fee structure → invoices → payment → receipt. Every payment gets its own receipt, so ₹12,000 in cash and ₹8,000 by UPI against one invoice produce two receipts, not a note in the margin.
+
+→ And a platform console on our side, where a school is onboarded in minutes and a three-branch group is grouped under one customer — while every branch stays a separate tenant with its own login, its own data and its own subscription.
+
+Three decisions I'd defend in any review:
+
+1. Money has two directions and we never mix them. Fees go into the school's own Razorpay account and we never touch them. The subscription is the only money that reaches us.
+
+2. An owner is a grouping record, never an account. Three branches under one trust sit side by side on our console, but no branch can read a sibling's data — scopeFilter stays keyed on the school, under every query.
+
+3. The school calls a PTM; the parent is told. A parent never requests or accepts a meeting slot, and both routes exclude them on the server, not just in the UI. It sounds like a small product decision. It's the difference between a calendar and one more group chat.
+
+There are no fixed plans, either. A subscription is billed per invoice for any number of days, so a 15-day trial and a two-year contract are the same shape in the code.
+
+Flutter on mobile, NestJS and MongoDB behind it, shipped from a self-hosted runner.
+
+If you run a preschool — or three — I'll walk you through it in 10 minutes. Comment "demo" or send me a DM.
+
+#SaaS #EdTech #Preschool #EarlyChildhoodEducation #Flutter #NestJS #BuildInPublic</p>
+      <p class="counthint" id="counthint">—</p>
+    </div>
+
+    <div class="alts">
+      <div class="alt">
+        <span class="tag">Alt hook · the number</span>
+        <p>"A preschool with 190 children issues roughly 2,300 fee receipts a year. Most of them are still written by hand."</p>
+      </div>
+      <div class="alt">
+        <span class="tag">Alt hook · the confession</span>
+        <p>"We spent two weeks arguing about who is allowed to schedule a parent-teacher meeting. It was the most valuable fortnight of the build."</p>
+      </div>
+      <div class="alt">
+        <span class="tag">Alt hook · the launch</span>
+        <p>"For two years we built other people's products. This one is ours. Meet Sproutly."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── recording ────────────────────────────────────── -->
+  <section class="section wrap hide-rec">
+    <span class="eyebrow">Getting the MP4</span>
+    <h2>Turning this into a video file</h2>
+    <p class="note">The reel plays in the browser; LinkedIn needs a file. Screen-record it once — Windows has a recorder built in.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="n">STEP 01</span>
+        <h3>Pick the ratio</h3>
+        <p>1:1 fills the most feed space on desktop and mobile both. Use 4:5 for maximum mobile height, 9:16 only if you'll also cut it for Reels.</p>
+      </div>
+      <div class="step">
+        <span class="n">STEP 02</span>
+        <h3>Enter record mode</h3>
+        <p>Everything but the reel disappears and it fills the screen. <kbd>Esc</kbd> exits, <kbd>Space</kbd> replays.</p>
+      </div>
+      <div class="step">
+        <span class="n">STEP 03</span>
+        <h3>Capture</h3>
+        <p>Press <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd> for Xbox Game Bar, or <kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> for Snipping Tool. Start the recorder first, then press Space.</p>
+      </div>
+      <div class="step">
+        <span class="n">STEP 04</span>
+        <h3>Trim and post</h3>
+        <p>Crop to the reel, trim the dead ends, export MP4. 36 seconds sits well inside LinkedIn's 10-minute limit. Post it silent — most of the feed is muted anyway.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── shot list ────────────────────────────────────── -->
+  <section class="section wrap hide-rec">
+    <span class="eyebrow">If you'd rather film the real thing</span>
+    <h2>Shot list against the live app</h2>
+    <p class="note">Same script, same order — swap each mock for a capture from the running product. That version will always outperform a mockup, because it's real.</p>
+    <div class="shotlist">
+      <table>
+        <thead><tr><th>Time</th><th>Scene</th><th>What to capture</th></tr></thead>
+        <tbody>
+          <tr><td>0.0 – 3.4</td><td><b>The hook</b><br><span>Text only</span></td><td>Nothing to film — keep the title card.</td></tr>
+          <tr><td>3.4 – 7.2</td><td><b>Three places</b><br><span>Text only</span></td><td>Optional: a real (blurred) WhatsApp group and a paper register on a desk.</td></tr>
+          <tr><td>7.2 – 11.5</td><td><b>The sprout grows</b></td><td>This scene already runs your real splash timings. To use the app's own, capture <span>assets/lottie/sproutly_splash.json</span> on device, or <span>App/assets/images/splash_animation.gif</span>.</td></tr>
+          <tr><td>11.5 – 17.1</td><td><b>Parent</b></td><td>Parent home in the Flutter app — attendance ring, the Meal / Nap / Mood / Health tiles, the fees-due card. Scroll it slowly, once.</td></tr>
+          <tr><td>17.1 – 22.1</td><td><b>Teacher</b></td><td>Teacher attendance marking. Tap through five or six students so the tally climbs on camera.</td></tr>
+          <tr><td>22.1 – 27.5</td><td><b>School office</b></td><td>Web admin fees page: generate invoices for one class, record a payment, let the receipt number appear.</td></tr>
+          <tr><td>27.5 – 31.8</td><td><b>Platform console</b></td><td>Super-admin Owners page with a linked multi-branch customer and the phase rollup.</td></tr>
+          <tr><td>31.8 – 36.3</td><td><b>The close</b></td><td>Keep the end card as-is.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="wrap hide-rec">
+    Sproutly — preschool management. Built and run by Duforge. Flutter · NestJS · MongoDB. Reel and copy drafted 1 September 2026.
+  </footer>
+</div>
+
+<script>
+(function(){
+  var stage = document.getElementById('stage');
+  var frame = document.getElementById('frame');
+  var scenes = Array.prototype.slice.call(frame.querySelectorAll('.scene'));
+  var playBtn = document.getElementById('play');
+  var recBtn  = document.getElementById('record');
+  var prog    = document.getElementById('prog');
+  var timer   = document.getElementById('timer');
+
+  /* scene 2 gets 4.3s so the splash can finish its own timings */
+  var DUR  = [3400, 3800, 4300, 5600, 5000, 5400, 4300, 4500];
+  var NAME = ['HOOK','THE MESS','SPROUT','PARENT','TEACHER','SCHOOL OFFICE','PLATFORM CONSOLE','CLOSE'];
+  var STARTS = [], total = 0;
+  for (var i = 0; i < DUR.length; i++){ STARTS.push(total); total += DUR[i]; }
+
+  var RATIO = {'1:1':1, '4:5':0.8, '9:16':0.5625, '16:9':16/9};
+
+  function fit(){
+    var r = stage.getBoundingClientRect();
+    if (!r.width) return;
+    var k = Math.min(r.width, r.height) / 900;
+    if (r.width / r.height > 1.4) k = (r.height * 0.94) / 900;
+    frame.style.setProperty('--k', k);
+  }
+  if (window.ResizeObserver){ new ResizeObserver(fit).observe(stage); }
+  window.addEventListener('resize', fit);
+  fit();
+
+  function countTo(el, to, ms, fmt){
+    var t0 = null;
+    function step(ts){
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / ms);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(Math.round(to * eased));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var rupee = function(n){ return '₹' + n.toLocaleString('en-IN'); };
+  var plain = function(n){ return String(n); };
+
+  var onEnter = {
+    3: function(){
+      var ring = document.getElementById('ring');
+      requestAnimationFrame(function(){ ring.style.setProperty('--p', '96%'); });
+    },
+    4: function(){ countTo(document.getElementById('tally'), 23, 2400, plain); },
+    5: function(){
+      countTo(document.getElementById('k1'), 486000, 1600, rupee);
+      countTo(document.getElementById('k2'),  72000, 1600, rupee);
+      countTo(document.getElementById('k3'),    214, 1600, plain);
+    }
+  };
+  function resetScene(i){
+    if (i === 3){ document.getElementById('ring').style.setProperty('--p', '0%'); }
+    if (i === 4){ document.getElementById('tally').textContent = '0'; }
+    if (i === 5){
+      document.getElementById('k1').textContent = '₹0';
+      document.getElementById('k2').textContent = '₹0';
+      document.getElementById('k3').textContent = '0';
+    }
+  }
+
+  var raf = null, t0 = 0, current = -1;
+
+  function setScene(i){
+    if (i === current) return;
+    current = i;
+    scenes.forEach(function(s, n){
+      if (n === i) s.classList.add('is-on'); else s.classList.remove('is-on');
+    });
+    if (onEnter[i]) onEnter[i]();
+  }
+
+  function tick(ts){
+    if (!t0) t0 = ts;
+    var e = ts - t0;
+    if (e >= total){
+      prog.style.width = '100%';
+      timer.textContent = (total/1000).toFixed(1) + 's / ' + (total/1000).toFixed(1) + 's · DONE';
+      playBtn.innerHTML = '↻&nbsp; Replay';
+      raf = null;
+      return;
+    }
+    var idx = 0;
+    for (var i = 0; i < STARTS.length; i++){ if (e >= STARTS[i]) idx = i; }
+    setScene(idx);
+    prog.style.width = (e / total * 100).toFixed(2) + '%';
+    timer.textContent = (e/1000).toFixed(1) + 's / ' + (total/1000).toFixed(1) + 's · ' + NAME[idx];
+    raf = requestAnimationFrame(tick);
+  }
+
+  function play(){
+    if (raf) cancelAnimationFrame(raf);
+    scenes.forEach(function(s){ s.classList.remove('is-on'); });
+    for (var i = 0; i < scenes.length; i++) resetScene(i);
+    current = -1; t0 = 0;
+    playBtn.innerHTML = '↻&nbsp; Restart';
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ raf = requestAnimationFrame(tick); }); });
+  }
+  playBtn.addEventListener('click', play);
+
+  var segs = document.querySelectorAll('.segs button');
+  segs.forEach(function(b){
+    b.addEventListener('click', function(){
+      segs.forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+      var r = b.dataset.r;
+      stage.dataset.ratio = r;
+      document.body.style.setProperty('--ar', RATIO[r]);
+      fit();
+    });
+  });
+  document.body.style.setProperty('--ar', 1);
+
+  function setRec(on){
+    document.body.classList.toggle('rec', on);
+    recBtn.innerHTML = on ? '■&nbsp; Exit record mode' : '●&nbsp; Record mode';
+    setTimeout(fit, 60);
+  }
+  recBtn.addEventListener('click', function(){ setRec(!document.body.classList.contains('rec')); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && document.body.classList.contains('rec')) setRec(false);
+    if (e.key === ' ' && document.body.classList.contains('rec')){ e.preventDefault(); play(); }
+  });
+
+  var postEl = document.getElementById('posttext');
+  var copyBtn = document.getElementById('copy');
+  copyBtn.addEventListener('click', function(){
+    var text = postEl.textContent;
+    var done = function(){
+      copyBtn.textContent = 'Copied';
+      setTimeout(function(){ copyBtn.textContent = 'Copy post'; }, 1800);
+    };
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); }
+      catch (err){ copyBtn.textContent = 'Select the text and copy'; }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else { fallback(); }
+  });
+
+  var n = postEl.textContent.length;
+  document.getElementById('counthint').textContent =
+    n + ' characters · LinkedIn allows 3,000 · the first 2 lines show before "…more"';
+
+  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!calm){ setTimeout(play, 500); } else { setScene(0); prog.style.width = '0%'; }
+
+  /* handed to the recorder below */
+  window.__reel = { play: play, setRec: setRec, total: total, stage: stage };
+})();
+</script>
+
+<script>
+/* ─────────────────────────────────────────────────────────
+   Record the reel and save it as a video file.
+   Works from localhost or file:// — NOT from the artifact
+   viewer, whose sandbox blocks page-initiated downloads.
+   ───────────────────────────────────────────────────────── */
+(function(){
+  var reel     = window.__reel;
+  var saveBtn  = document.getElementById('save');
+  var statusEl = document.getElementById('status');
+  if (!reel || !saveBtn) return;
+
+  function say(msg, kind){
+    statusEl.className = 'status' + (kind ? ' ' + kind : '');
+    statusEl.innerHTML = msg;
+  }
+
+  /* Prefer MP4 — LinkedIn accepts MP4/MOV but not WebM. Chrome 130+
+     records MP4 directly; older builds fall back and we say so. */
+  var CANDIDATES = [
+    'video/mp4;codecs=avc1.42E01E',
+    'video/mp4;codecs=avc1',
+    'video/mp4',
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm'
+  ];
+  function pickType(){
+    if (!window.MediaRecorder) return null;
+    for (var i = 0; i < CANDIDATES.length; i++){
+      if (MediaRecorder.isTypeSupported(CANDIDATES[i])) return CANDIDATES[i];
+    }
+    return null;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia || !pickType()){
+    saveBtn.disabled = true;
+    saveBtn.style.opacity = '.5';
+    saveBtn.style.cursor = 'not-allowed';
+    say('This page cannot record itself here. Open the local copy in Chrome or Edge, ' +
+        'or use <strong>Record mode</strong> with Win+Alt+R instead.', 'bad');
+    return;
+  }
+
+  var busy = false;
+
+  saveBtn.addEventListener('click', async function(){
+    if (busy) return;
+    busy = true;
+    saveBtn.disabled = true;
+    saveBtn.style.opacity = '.6';
+
+    var stream;
+    try {
+      say('Choose <strong>This tab</strong> in the picker…', 'busy');
+      stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { frameRate: 60 },
+        audio: false,
+        preferCurrentTab: true,
+        selfBrowserSurface: 'include',
+        surfaceSwitching: 'exclude'
+      });
+    } catch (err){
+      say('Recording cancelled — nothing was saved.', null);
+      busy = false; saveBtn.disabled = false; saveBtn.style.opacity = '';
+      return;
+    }
+
+    var track = stream.getVideoTracks()[0];
+
+    /* Region Capture crops the recording to the reel itself, so there is
+       no browser chrome or letterboxing to trim afterwards. */
+    var cropped = false;
+    try {
+      if (window.CropTarget && CropTarget.fromElement && track.cropTo){
+        var target = await CropTarget.fromElement(reel.stage);
+        await track.cropTo(target);
+        cropped = true;
+      }
+    } catch (err){ cropped = false; }
+
+    var type   = pickType();
+    var isMp4  = type.indexOf('video/mp4') === 0;
+    var chunks = [];
+    var rec;
+    try {
+      rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 12000000 });
+    } catch (err){
+      rec = new MediaRecorder(stream);
+      isMp4 = (rec.mimeType || '').indexOf('mp4') !== -1;
+    }
+
+    rec.ondataavailable = function(e){ if (e.data && e.data.size) chunks.push(e.data); };
+
+    rec.onstop = function(){
+      stream.getTracks().forEach(function(t){ t.stop(); });
+      reel.setRec(false);
+
+      var ext   = isMp4 ? 'mp4' : 'webm';
+      var blob  = new Blob(chunks, { type: isMp4 ? 'video/mp4' : 'video/webm' });
+      var url   = URL.createObjectURL(blob);
+      var ratio = reel.stage.dataset.ratio.replace(':', 'x');
+      var name  = 'sproutly-reel-' + ratio + '.' + ext;
+      var a     = document.createElement('a');
+      a.href = url; a.download = name;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+
+      var mb   = (blob.size / 1048576).toFixed(1);
+      var crop = cropped ? '' : ' It captured the whole tab, so crop it to the reel before posting.';
+      if (isMp4){
+        say('Saved <strong>' + name + '</strong> · ' + mb + ' MB · ready to upload to LinkedIn.' + crop, null);
+      } else {
+        say('Saved <strong>' + name + '</strong> · ' + mb + ' MB. This browser could only record WebM, which ' +
+            'LinkedIn does not accept — convert it first: <em>ffmpeg -i ' + name +
+            ' -c:v libx264 -pix_fmt yuv420p sproutly-reel.mp4</em>' + crop, 'bad');
+      }
+
+      busy = false; saveBtn.disabled = false; saveBtn.style.opacity = '';
+    };
+
+    /* if sharing is stopped from Chrome's own bar, wrap up cleanly */
+    track.addEventListener('ended', function(){
+      if (rec.state !== 'inactive') rec.stop();
+    });
+
+    reel.setRec(true);
+    say('Recording… leave the window alone for ' + Math.ceil(reel.total / 1000) + ' seconds.', 'busy');
+
+    /* let record mode settle, then start clean from frame one */
+    setTimeout(function(){
+      rec.start();
+      reel.play();
+      setTimeout(function(){
+        if (rec.state !== 'inactive') rec.stop();
+      }, reel.total + 900);
+    }, 700);
+  });
+})();
+</script>

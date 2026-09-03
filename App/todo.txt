@@ -1,0 +1,477 @@
+================================================================================
+SPROUTLY — TO-DO LIST TO MATCH THE WORKFLOW DIAGRAMS
+Generated: 2026-07-07  ·  Updated: 2026-07-10  ·  Current app version: v1.1.2
+================================================================================
+
+Release log (oldest first):
+  v1.0.0  - Super Admin on the real backend
+  v1.0.1  - Invite-based admin onboarding
+  v1.0.2  - Parent OTP login + Admin wired to real backend
+  v1.0.3  - Teacher and Parent roles wired to real backend
+  v1.0.4  - All portals completed per workflow diagrams
+  v1.0.5  - Indian phone format + attendance contract fixes
+  v1.0.6  - UI/UX polish: smooth animations
+  v1.0.7  - Parent Complete-Profile + parent/teacher data pass
+  v1.0.8  - Parent soft-UI re-theme, animated OTP, real notifications
+  v1.0.9  - Teacher neumorphic redesign, per-student diary, account-switch fix
+  v1.1.0  - Notification fixes, clear-read, parent profile-update alert
+  v1.1.1  - Parent <-> Teacher direct messaging   <-- P5 DONE
+  v1.1.2  - Super admin web parity + liquid-glass re-theme; super admin can
+            only create school-admin accounts (teacher/parent/student creation
+            blocked in UI + API); parent notification preferences (P7);
+            two-way PTM — teachers can request meetings too (P9)
+
+Status legend:
+  [DONE vX.Y.Z] = real API, complete (shipped in that version)
+  [MOCK]        = screen exists but uses hardcoded data
+  [PARTIAL]     = partial real, partial mock, or wiring only
+  [MISSING]     = no screen / no service / no API call
+
+Shell structure: lib/routing/home_shell.dart
+  Parent:     Home · Attendance · Fees · Academics · More
+  Teacher:    Home · Attendance · Students · Academics · More
+  Admin:      Home · Students · Attendance · Fees · More
+  SuperAdmin: Home · Schools · Users · Settings   (Reports tab removed v1.1.2)
+
+================================================================================
+TIER 1 — HIGH VALUE, LOW COST
+================================================================================
+These are screens that exist already and just need the mock data swapped for
+a real backend call. Most of the work is in the existing *_api.dart singletons
+and the screen widgets — no new endpoints (unless flagged).
+
+--------------------------------------------------------------------------------
+PARENT  (Diagram 2, yellow)
+--------------------------------------------------------------------------------
+
+[P1] [DONE v1.1.1] GALLERY — show real photos/videos posted by teachers
+      Where:   lib/features/parent/screens/parent_more.dart
+               _GalleryScreen (was hardcoded emoji grid)
+      Did:     GalleryItem model in api_models.dart (id, title, notes, metadata, url, thumbnailUrl, mediaType)
+               ParentApi.listGallery() → GET /gallery with pagination
+               _GalleryScreen now a StatefulWidget: fetches real data, shows thumbnails
+               in a 3-col grid with loading/empty/error states, pull-to-refresh,
+               tap opens a full-screen _GalleryDetailScreen with InteractiveViewer
+
+[P2] [DONE v1.1.1] TRANSPORT — real route/driver/live ETA for the selected child
+      Where:   parent_more.dart  _TransportScreen (was hardcoded bus+map)
+      Did:     Backend: added GET /transport/mine (returns school vehicles, any role).
+               TransportInfo model in api_models.dart (title, notes, metadata with
+               routeName, vehicleNumber, driverName, driverPhone getters).
+               ParentApi.getMyTransport() → GET /transport/mine.
+               _TransportScreen now a StatefulWidget: fetches real data, shows
+               route/vehicle/driver info, driver phone call button, map placeholder
+               with "Track on map" action, loading/empty/error states, pull-to-refresh.
+
+[P3] [DONE v1.1.1] DAYCARE — meal/nap/activity/health log per child (parent view)
+      Where:   parent_more.dart  _DaycareScreen (was placeholder toast)
+      Did:     _DaycareScreen now a StatefulWidget: fetches real diary via
+               ParentApi.getDiary(studentId, date), date picker in app bar,
+               _DaycareSummary card (5 stat columns: meals/naps/play/health/mood),
+               timeline with color-coded kind-specific icons (cup/moon/star/heart/happy),
+               loading/empty/error states, pull-to-refresh.
+
+[P4] [DONE] ACHIEVEMENTS — milestones + awards from backend
+      Where:   parent_more.dart  _AchievementsScreen
+      Did:     Already wired: _AchievementsScreen fetches
+               ParentApi.getStudentMilestones(child.id), category-emoji grid,
+               status colors (achieved/emerging), detail sheet with notes +
+               achieved date, loading/empty/error + pull-to-refresh.
+               (Todo entry was stale — verified real on 2026-07-10.)
+
+[P5] [DONE v1.1.1] COMMUNICATION -> MESSAGES — direct parent <-> teacher chat
+      Where:   parent_more.dart  _MessagesTab (inbox) + _ChatThreadScreen (thread)
+               teacher_more.dart  Messages tile -> teacher_messages.dart
+               (inbox + TeacherChatThreadScreen + new-message picker)
+      Did:     ParentApi.sendMessage / inboxMessages / sentMessages / conversation /
+               markMessageRead / unreadMessageCount + getClass() helper
+               TeacherApi: same 5 message methods + getUser() helper
+               New MessageModel in api_models.dart (handles bare-id AND populated shapes)
+               Server-side: communication.service.ts now .populate('sender', 'name role
+                 email') and .populate('recipient', ...) so names show in the UI
+                 (.populate('relatedStudent', 'firstName lastName') on conversation)
+      Decision (2026-07-10): chat stays open WhatsApp-style. Request-to-chat
+                 approval and timed (5-min) sessions were considered and
+                 REJECTED — both parties are vetted school members, so gates
+                 add friction without a safety benefit. If teachers ever get
+                 spammed, prefer "office hours" / mute over request gates.
+      Real-time (2026-07-10, v1.1.2): chat is now live via SSE —
+                 GET /communication/messages/stream (no new deps; NestJS @Sse
+                 + Dio stream, 25s heartbeat, auto-reconnect). An open stream
+                 doubles as presence: sendMessage pushes instantly to a
+                 recipient with a chat screen open, otherwise it files an
+                 in-app notification ("New message from X") via the
+                 notifications module. Client: core/network/message_stream.dart
+                 held open by both thread screens (parent + teacher).
+      Still:     push-to-phone when the app is killed needs FCM credentials
+                 (push.provider stub) — same external bucket as Twilio.
+
+[P6] [DONE] SETTINGS -> EDIT PROFILE — real parent profile form
+      Where:   parent_more.dart  _ParentSettingsScreen
+      Did:     Already wired: email from AuthApi.currentSession (read-only field),
+               name/phone saved via ParentApi.updateMyProfile → PATCH /users/me.
+               (Todo entry was stale — verified real on 2026-07-10.)
+
+[P7] [DONE v1.1.2] NOTIFICATION PREFERENCES — the four reminder opt-ins
+      Where:   parent_more.dart  _ParentSettingsScreen -> Notifications sheet
+      Did:     Backend: notificationPrefs on user.schema (raw subdoc),
+               GET/PATCH /users/me/notification-prefs (any authenticated user,
+               defaults all-on for older accounts), UpdateNotificationPrefsDto.
+               App: _NotificationPrefsSheet loads real prefs and saves the four
+               diagram toggles — fee reminders, attendance alerts, homework
+               notifications, event reminders (replaces the 3 fake toggles).
+      Still:   Actual SMS/WhatsApp delivery needs Twilio / WhatsApp Business
+               credentials — sms/whatsapp backend modules exist as stubs and
+               should consult these flags when wired.
+
+[P8] [DONE] FAQ + ABOUT US tiles
+      Where:   parent_more.dart  _ParentSettingsScreen
+      Did:     Already present: Help & FAQ sheet (static Q&A), About sheet,
+               and the school contact card (GET /schools/mine via
+               ParentApi.getSchoolContact) shown in parent_student_profile's
+               Contacts tab.  (Todo entry was stale — verified 2026-07-10.)
+
+[P9] [DONE v1.1.2] TWO-WAY PTM — teachers can request meetings too
+      Where:   teacher_more.dart TeacherPtmScreen (+ new request sheet),
+               parent_more.dart _PtmList (accept/decline incoming)
+      Did:     Backend: PtmRequest gained a `parent` field; POST /ptm sets
+               parent/teacher by requester role (teacher passes parentId =
+               student.parentUserId); GET /ptm/mine now also returns requests
+               addressed to me; PATCH /ptm/:id/respond open to parents (own
+               incoming only), nobody can respond to their own request, and
+               a parent's response no longer overwrites the teacher field.
+               App: PtmModel.requestedById + incomingFor(); teacher PTM screen
+               has a "Request a PTM" sheet (student picker from their classes,
+               reason) and shows "waiting for the parent" on outgoing ones;
+               parent PTM tab shows "From teacher" requests with suggested
+               slots and Accept / Decline buttons.
+
+--------------------------------------------------------------------------------
+TEACHER  (Diagram 1 right, blue)
+--------------------------------------------------------------------------------
+
+[T1] [DONE v1.1.2] QUICK ACTION: ADD REMARK
+      Where:   teacher_home.dart  _AddRemarkSheet
+      Did:     Already wired (todo entry was stale): class picker → student
+               picker → category dropdown → remark text → POST /academic/remarks
+               via TeacherApi.addRemark. Fixed 2026-07-10: the remark TextField
+               had no onChanged, so the Save button never re-enabled as you
+               typed — added setState so it enables correctly.
+
+[T2] [DONE] QUICK ACTION: HOMEWORK
+      Where:   teacher_home.dart  Quick actions row
+      Did:     Already wired (todo entry was stale): the Homework quick action
+               routes to TeacherAcademicsScreen (full homework CRUD), not a
+               placeholder. Verified 2026-07-10.
+
+[T3] [DONE v1.1.1] GALLERY -> UPLOAD PHOTOS/VIDEOS
+      Where:   teacher_more.dart  TeacherGalleryUploadScreen
+               (was emoji grid + fake "uploading" toast)
+      Did:     Backend: added TEACHER role to gallery POST/PATCH/DELETE, added
+               POST /gallery/upload (multipart file via multer, serves at /uploads),
+               ServeStaticModule for serving uploaded files.
+               TeacherApi.uploadGallery(filePath, title, notes) via FormData,
+               TeacherApi.listGallery() → GET /gallery.
+               TeacherGalleryUploadScreen now shows real items from API in a
+               3-col grid, Upload button opens image_picker, adds optional caption,
+               uploads with loading state + error handling, pull-to-refresh.
+
+[T4] [PARTIAL] REPORTS — real class/subject reports
+      Where:   teacher_more.dart  TeacherReportsScreen
+      Did:     (2026-07-10) Today's attendance summary per class was already
+               real (getClassSummary). Wired the Assessment Results card to a
+               new _AssessmentAveragesScreen — TeacherApi.getAssessmentResults
+               (GET /academic/assessments/:id/results); shows per-assessment
+               average % + a headline class average across scored assessments.
+      Left:    Homework Completion card is still a "coming soon" toast — it
+               needs a submissions/completion-tracking backend (no such model
+               or endpoint exists today). Genuinely blocked on new backend.
+
+[T5] [DONE v1.1.2] SETTINGS — edit profile, change password, notif prefs
+      Where:   teacher_more.dart  TeacherSettingsScreen
+      Did:     Edit profile (name/phone via PATCH /users/me) and change
+               password were already real. 2026-07-10: replaced the
+               "Notifications coming soon" toast with a real prefs sheet
+               reusing the shared P7 endpoint — TeacherApi.getNotificationPrefs
+               / updateNotificationPrefs; teacher-relevant toggles (messages,
+               attendance, homework, events). Added a shared
+               `messageNotifications` pref key (backend DTO + DEFAULT_PREFS +
+               user.schema) that ties to the real-time chat notifications.
+               (No language picker — deferred; not blocking.)
+
+[T6] [DONE] DAILY DIARY: HEALTH NOTE (teacher-side surface)
+      Where:   teacher_more.dart  TeacherDiaryScreen
+      Did:     Already wired (todo entry was stale): the daily-update form has
+               a Health note section (type chips + description) posted via
+               TeacherApi.postHealth alongside meal/nap/activity/mood. Parent
+               side surfaces these in the diary + daycare timeline (P3).
+               Verified 2026-07-10.
+
+--------------------------------------------------------------------------------
+ADMIN  (Diagram 1 left, green)
+--------------------------------------------------------------------------------
+
+[A1] [DONE] REPORTS & ANALYTICS — real attendance/fee/enrollment/staff
+      Where:   admin_students.dart  AdminReportsScreen
+      Did:     Already real (todo entry was stale): loads dashboard stats,
+               fee collection summary, outstanding summary, and class list
+               (AdminApi.getDashboardStats / collectionSummary /
+               outstandingSummary / listClasses); shows student/staff/class
+               counts, today's attendance (present/absent/unmarked + marked
+               progress), and fee summary. Verified 2026-07-10.
+      Optional: could render these as fl_chart graphs instead of stat cards/
+                pills, but the DATA is real — purely a visual upgrade.
+
+[A2] [DONE v1.1.2] TRANSPORT — real route/vehicle management
+      Where:   admin_students.dart  AdminTransportScreen + _TransportDetailScreen
+      Was:     Backend was already fully built (todo "needs new endpoints" was
+               stale): /transport CRUD + assign/unassign student & staff,
+               admin-gated, school-scoped. List/create/detail with assignment
+               were already real in the app.
+      Did:     (2026-07-10) Closed the real gap — the create form only captured
+               title + notes, so the driver / vehicle number / route the PARENT
+               view shows were always empty. New shared _showTransportForm
+               captures the full field set (route, vehicle number, driver name,
+               driver phone, notes) for both create AND edit. Added
+               AdminApi.updateTransport (PATCH) + deleteTransport (DELETE);
+               detail screen gained Edit + Delete app-bar actions and a
+               vehicle-details card (route/vehicle/driver/phone) at the top.
+               (2026-07-10) Parent "Call driver" button was a fake toast — now
+               opens the real phone dialer via url_launcher (tel:). Added
+               url_launcher ^6.3.1 to pubspec + a DIAL <queries> intent in
+               AndroidManifest for Android 11+. NOTE: run `flutter pub get`
+               (and rebuild the app, not just hot-reload) to pick up the new
+               native dependency.
+
+[A3] [PARTIAL] SETTINGS — school profile, academic year, fee config
+      Where:   admin_students.dart  AdminSettingsScreen
+      Did:     Edit profile (name/phone) and change password were already
+               real (AdminApi.updateMyProfile → PATCH /users/me). 2026-07-10:
+               replaced the "Notifications coming soon" toast with a real
+               prefs sheet on the shared P7 endpoint (fee / attendance /
+               event alerts) — AdminApi.getNotificationPrefs /
+               updateNotificationPrefs. X7 now covers all three roles.
+      Did (2026-07-10, DONE): added PATCH /schools/mine (admin/principal;
+               scoped to the caller's own school via the token, declared before
+               :id so the literal path wins) + UpdateMySchoolDto (name, contact
+               email/phone, address, currentAcademicYear — deliberately NOT
+               code/status/modules). Added a `currentAcademicYear` field to the
+               school schema; GET /schools/mine now returns it too. App:
+               AdminApi.getMySchool / updateMySchool + AdminSchoolProfile model,
+               and a "School profile" row in Admin Settings opening an editor
+               sheet (name, contact, address, academic year). A3 fully closed.
+      Note:    logo upload was dropped from scope (needs file storage wiring);
+               everything else in A3 is done.
+
+[A4] [DONE v1.1.2] HOLIDAY CALENDAR — real holidays list
+      Did:     (2026-07-10) New backend Holidays module — Holiday schema
+               (schoolId, title, date, description; unique per school+day),
+               CreateHolidayDto, HolidaysService, HolidaysController
+               (GET /holidays any role · POST/DELETE admin/principal), wired
+               into app.module. App: HolidayModel + AdminApi.listHolidays /
+               createHoliday / deleteHoliday. New admin "Holidays" tile → a
+               dedicated screen (date-badge list, add FAB, delete, past
+               greyed). The home "Mark Holiday" quick action now posts a REAL
+               holiday via the shared showAdminHolidayForm (was posting a
+               generic event tagged "Holiday").
+      Left:    Render holidays on the parent + teacher + admin calendars
+               (GET /holidays is ready for all roles) — additive follow-up;
+               e.g. shade holiday days in parent_attendance's month grid.
+
+[A5] [MISSING] APPROVAL WORKFLOW + WAITLIST under Admissions
+      Diagram: "Admissions -> Approval Workflow, Waitlist Management"
+      Where:   Today admin_students.dart AdminAdmissionsScreen flips
+               inquiry.status inline
+      Add:     Multi-step approval state machine
+                 (review -> approved by principal -> confirmed)
+               "Waitlist" tab listing inquiries past capacity
+               Drag-to-promote action
+
+[A6] [MISSING] PAYROLL OVERVIEW under Staff
+      Diagram: "Staff Management -> Payroll Overview"
+      Needs:   New backend
+                 GET/POST /payroll/{staffId}/{month}
+                 Salary components, payslip PDF
+      Then:    Staff -> Payroll tab with month picker + payslip view
+
+[FEE] FEE MANAGEMENT — spec-compliance audit (2026-07-10)
+      Backend fee domain was already fully built (structures CRUD, generate,
+      payments, receipts, reports). The ADMIN APP was missing the two creation
+      flows entirely — audit found ~40% of the backend was surfaced.
+      DID (v1.1.2): rebuilt AdminFeesScreen into 3 tabs matching the spec —
+        · Structures tab: list + create/edit/delete fee-structure templates
+          (name, frequency, academic year, dynamic components w/ live total,
+          due day). AdminApi.listStructures/saveStructure/deleteStructure +
+          FeeStructureModel.
+        · Generate tab: pick structure + class + period + due date →
+          POST /fees/invoices/generate; shows created/skipped counts.
+        · Invoices tab: summary cards + All/Unpaid/Paid filter + invoice
+          breakdown sheet with line items and a REAL record-payment form —
+          custom amount (partial payments), method picker (cash/card/upi/
+          bank_transfer/cheque), optional note (was full-cash-only before).
+      STILL OPEN (from the audit, ranked):
+        1. Overdue status never set — no code path or scheduler flips
+           past-due pending/partial invoices to 'overdue'; the chips are dead.
+           Fix: a scheduled job OR compute-on-read in findInvoices/dues.
+        2. Receipt generated but never shown — add getReceipt/invoicePayments
+           calls + a receipt / payment-history view after recording.
+        3. Collection report drops byMethod + no date range (models +
+           admin_api.collectionSummary) — parse byMethod, pass from/to, render.
+        4. Invoice list caps at limit:50 and ignores server ?status — paginate
+           / raise limit; push the filter server-side for big schools.
+        5. SECURITY: GET /fees/students/:id/invoices and /fees/dues have no
+           parent↔child ownership check (IDOR) — a parent could read another
+           student's invoices in the same school. Add a guardian check.
+        6. Invoice/payment/receipt numbering is read-max-then-increment (no
+           atomic counter) — can duplicate under concurrent requests → E11000.
+        7. Structure dueDayOfMonth is stored but unused — generate applies one
+           flat dueDate to all; could derive per-period due dates from it.
+
+--------------------------------------------------------------------------------
+SUPER ADMIN  (not in the diagrams but flagged as gaps)
+--------------------------------------------------------------------------------
+
+[SA1] [DONE v1.1.2] DASHBOARD — real platform-wide metrics (web parity)
+      Where:   lib/features/super_admin/screens/super_admin_home.dart
+      Did:     Full web-console parity on the real backend: KPIs from
+               GET /schools/stats + accounts total from GET /users,
+               schools-by-status distribution, recent schools, quick actions.
+               Schools tab: search + status filter + stats strip + detail page
+               (GET /schools/:id/overview + per-school accounts) + module
+               toggles + full create-school form with invite link.
+               Users tab: read-only directory with school names, suspend/
+               reactivate; school-admin creation via Home quick action only.
+               Hardcoded stats/school-health/alerts removed; Local* mock
+               school/user services deleted. Whole portal re-themed to
+               liquid glass (frosted cards/nav/sheets over ambient blobs).
+      Policy:  Super admin can ONLY create school-admin accounts — teacher,
+               parent and student creation blocked in app + web UI and
+               enforced 403 in users/students controllers.
+
+[SA2] [DONE v1.1.2 — removed] REPORTS — platform reports
+      Did:     Reports tab removed by product decision (no backend for
+               DAU/revenue; web console has no reports either).
+               Revisit only if a /platform/metrics endpoint ever ships.
+
+[SA3] [DONE v1.1.2] SETTINGS — slimmed to real data
+      Did:     Fake WhatsApp/FCM/Razorpay rows removed; now shows the
+               signed-in account (from the JWT session) + logout.
+               Add-later ideas: change-password, platform toggles.
+
+================================================================================
+TIER 2 — ARCHITECTURAL / CLEANUP WORK
+================================================================================
+These don't add new diagram nodes but improve the codebase so future Tier-1
+work goes faster.
+
+[X1] [PARTIAL] Make the service layer actually used
+     Issue:  lib/core/services/services_scope.dart exposes
+             context.services.<x>, but every screen imports *Api directly.
+     Done:   Local school/user mocks deleted (v1.1.2); super admin screens go
+             through context.services for schools/users.
+     Left:   Either migrate the remaining Local* services/screens through
+             ServicesScope, or drop the unused ones.
+
+[X2] Add an AppError boundary widget
+     Issue:  Each screen does its own try/catch and toasts '$e' raw.
+     Add:    Centralized Dio-exception -> user-friendly toast mapper
+             (network down, 401 refresh failed, 403 forbidden, 500 server)
+     Note:   super_admin_home.dart has a local _errorText() mapper that could
+             be promoted to core and reused.
+
+[X3] Add a LoadingOverlay / AsyncValue<T> pattern
+     Issue:  Many FutureBuilder calls in *_more.dart duplicate
+             if (snap.connectionState == waiting) ... / empty-state code
+             per screen.
+
+[X4] Add a top-level router for the four portals
+     Issue:  go_router is in deps but unused (per CLAUDE.md).
+             App uses raw Navigator + MaterialPageRoute.
+     Add:    Single route table to simplify deep links from notifications
+             (profile_change_request already does this).
+
+[X5] Tests
+     Today:  Only test/widget_test.dart exists.
+     Add:    Per-API unit tests against a mocked Dio
+             Per-screen golden/widget tests for the four home screens
+             Integration test for the OTP login
+
+[X6] [SUPERSEDED for super admin] Re-theme admin portal
+     Was:    Extend neumorphic soft-UI to admin + super admin.
+     Now:    Super admin uses its own liquid-glass theme (v1.1.2).
+     Left:   Decide admin portal look (flat softWhite today): neumorphic to
+             match parent/teacher, or glass to match super admin.
+
+[X7] Notification preferences centralization
+     Issue:  The reminder-toggle panel should be shared across roles rather
+             than rebuilt per portal.
+     Done:   Backend endpoint + parent sheet (P7) and teacher sheet (T5),
+             both on GET/PATCH /users/me/notification-prefs; shared
+             `messageNotifications` key added (v1.1.2).
+     Left:   Reuse the same endpoint in admin (A3) settings; optionally
+             extract one shared NotificationPrefsSheet widget instead of the
+             two near-identical per-role copies.
+
+[X8] Cache invalidation audit
+     Issue:  v1.0.9 fixed the parent account-switch cache bug.
+             Apply the same userId-tagging pattern to other role APIs
+             (teacher class lists, admin student lists, etc.) so that
+             logging out + logging in as a different account never
+             leaks cached data from the previous user.
+
+================================================================================
+TIER 3 — NICE TO HAVE, NOT IN ANY DIAGRAM
+================================================================================
+These appear in the app but are not in any of the three workflow diagrams.
+Confirm with the user whether to keep, remove, or promote.
+
+[N1] Parent "Achievements" tile in parent_more.dart
+     Resolved: real feature — P4 is wired to milestones API. Keep.
+
+[N2] Parent "Daycare" tile in parent_more.dart
+     Issue:   Overlaps with "Today's diary" on Home.
+     Decision: Keep as a deeper timeline view?
+
+[N3] Parent "Settings" tile in parent_more.dart
+     Issue:   Diagram's "Settings" sits under "Student Profile" instead.
+     Decision: Move Settings into Student Profile as a sub-section.
+
+[N4] Teacher "Diary" tile in teacher_more.dart
+     Issue:   v1.0.9 changelog says "Diary tile left the More grid" but
+              it still exists in the codebase.
+     Decision: Verify removal or confirm it's intentionally still there.
+
+[N5] Admin "Admissions", "Staff", "Fees", "Communication", "Events",
+     "Transport", "Reports", "Settings", "Leave Mgmt" all live under the
+     "More" tab.
+     Issue:   Diagrams imply these are first-class nodes.
+     Decision: Promote the most-used to bottom-nav slots? (5 slots taken)
+
+================================================================================
+SUGGESTED ORDER OF EXECUTION
+================================================================================
+Last shipped: v1.1.2 (super admin parity + glass, creation policy, P7 + P9
++ real-time chat + two-way PTM + teacher T1/T2/T4/T5/T6).
+Parent Tier-1 (P1-P8), Super Admin (SA1-SA3), and Teacher Tier-1 (T1-T6)
+are all OFF the list (T4's homework-completion card is the only teacher
+item left, blocked on a new submissions backend). Next up:
+
+1. Single batch (1-2 days):   Tier 1 A1-A6  (admin side)  <-- NEXT
+   Admin has the biggest backend gap (Transport routes, Holiday Calendar,
+   Approval Workflow, Waitlist, Payroll). Scope which need backend work
+   first vs which can ship UI with a "coming soon" placeholder.
+   Start with A1 (Reports) and A3 (Settings) — both can reuse existing
+   endpoints (fees reports, PATCH /schools/mine, the P7 notif-prefs sheet).
+
+3. Cross-cutting (1 day each): Tier 2 X1 -> X8, in any order.
+   X2 + X3 are quality-of-life; X7 finishes by reusing the P7 sheet.
+
+4. Decisions (1 hour):        Tier 3 N2-N5  (confirm before touching).
+
+5. External dependency:       SMS/WhatsApp delivery (P7 note) — needs
+   Twilio / WhatsApp Business credentials before the sms/whatsapp modules
+   can send anything.
+
+================================================================================
+END OF TO-DO LIST
+================================================================================

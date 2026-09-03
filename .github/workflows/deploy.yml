@@ -1,0 +1,130 @@
+name: Deploy Sproutly
+
+# Deploys on every push to main, and on demand.
+#
+# Runs on a **self-hosted** runner that lives on the VPS itself. A
+# GitHub-hosted runner cannot be used: Hostinger's edge firewall drops inbound
+# port 22, so `ssh` from GitHub times out. Outbound works, so the box dials out
+# to GitHub and the deploy becomes a local file copy — no SSH key in CI at all.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Backend/**'
+      - 'Web/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+# One deploy at a time. Two overlapping rsyncs into the same release directory
+# would interleave files and leave a half-updated build running.
+concurrency:
+  group: sproutly-deploy
+  cancel-in-progress: false
+
+env:
+  DEPLOY_ROOT: /Milan/sproutly
+  API_PORT: '8500'
+  WEB_PORT: '8501'
+
+jobs:
+  backend:
+    name: API
+    runs-on: [self-hosted, sproutly]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install and build
+        working-directory: Backend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Publish release
+        working-directory: Backend
+        run: |
+          set -euo pipefail
+          RELEASE="$DEPLOY_ROOT/backend/release"
+          mkdir -p "$RELEASE"
+          # `dist` and the production dependency tree are the whole runtime.
+          # --delete keeps the release honest: a file deleted in git must not
+          # linger on the server and keep getting served.
+          rsync -a --delete dist/ "$RELEASE/dist/"
+          rsync -a package.json package-lock.json "$RELEASE/"
+          cd "$RELEASE"
+          npm ci --omit=dev
+
+      - name: Restart
+        run: |
+          set -euo pipefail
+          cd "$DEPLOY_ROOT/backend/release"
+          # `--update-env` so a changed .env is picked up; pm2 otherwise reuses
+          # the environment captured when the process first started.
+          pm2 reload sproutly-api --update-env || pm2 start dist/main.js \
+            --name sproutly-api --cwd "$DEPLOY_ROOT/backend/release"
+          pm2 save
+
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' \
+              -X POST "http://127.0.0.1:$API_PORT/api/auth/login" || true)
+            # 400 is the expected validation error for an empty body — it proves
+            # the app booted and is routing, which a 000/502 would not.
+            if [ "$code" = "400" ]; then echo "API healthy"; exit 0; fi
+            sleep 3
+          done
+          echo "API did not come up; last status: ${code:-none}"
+          pm2 logs sproutly-api --lines 40 --nostream || true
+          exit 1
+
+  web:
+    name: Web
+    runs-on: [self-hosted, sproutly]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install and build
+        working-directory: Web
+        env:
+          # Baked in at build time — Next inlines NEXT_PUBLIC_* into the bundle,
+          # so this cannot be supplied later from the runtime environment.
+          NEXT_PUBLIC_API_BASE_URL: https://api.sproutly.duforge.tech/api
+        run: |
+          npm ci
+          npm run build
+
+      - name: Publish release
+        working-directory: Web
+        run: |
+          set -euo pipefail
+          RELEASE="$DEPLOY_ROOT/web/release"
+          mkdir -p "$RELEASE"
+          # The standalone output already contains the trimmed node_modules and
+          # a server.js entrypoint; static/ and public/ are not copied into it
+          # by Next, so they go alongside.
+          rsync -a --delete .next/standalone/ "$RELEASE/"
+          rsync -a --delete .next/static/ "$RELEASE/.next/static/"
+          [ -d public ] && rsync -a --delete public/ "$RELEASE/public/" || true
+
+      - name: Restart
+        run: |
+          set -euo pipefail
+          cd "$DEPLOY_ROOT/web/release"
+          pm2 reload sproutly-web --update-env || \
+            PORT="$WEB_PORT" HOSTNAME=127.0.0.1 pm2 start server.js \
+              --name sproutly-web --cwd "$DEPLOY_ROOT/web/release"
+          pm2 save
+
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' \
+              "http://127.0.0.1:$WEB_PORT/login/admin" || true)
+            if [ "$code" = "200" ]; then echo "Web healthy"; exit 0; fi
+            sleep 3
+          done
+          echo "Web did not come up; last status: ${code:-none}"
+          pm2 logs sproutly-web --lines 40 --nostream || true
+          exit 1

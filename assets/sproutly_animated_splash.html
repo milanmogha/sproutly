@@ -1,0 +1,77 @@
+<div style="display:flex;justify-content:center;padding:1rem 0">
+<div style="width:300px;height:640px;border-radius:24px;background:#2E7D32;position:relative;overflow:hidden">
+
+<style>
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes growUp{0%{transform:scaleY(0);opacity:0}100%{transform:scaleY(1);opacity:1}}
+@keyframes leafL{0%{transform:rotate(30deg) scale(0);opacity:0}100%{transform:rotate(30deg) scale(1);opacity:1}}
+@keyframes leafR{0%{transform:rotate(-35deg) scale(0);opacity:0}100%{transform:rotate(-35deg) scale(1);opacity:1}}
+@keyframes popIn{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes bubbleFloat{0%{transform:translate(0,0) scale(1);opacity:.3}50%{transform:translate(5px,-15px) scale(1.1);opacity:.45}100%{transform:translate(0,0) scale(1);opacity:.3}}
+@keyframes sparkle{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:.7;transform:scale(1.2)}}
+
+.phone-bg{position:absolute;border-radius:50%;background:#388E3C}
+.b1{width:80px;height:80px;top:40px;left:-10px;opacity:.4;animation:bubbleFloat 4s ease-in-out infinite}
+.b2{width:110px;height:110px;top:100px;right:-20px;opacity:.3;animation:bubbleFloat 5s ease-in-out 1s infinite}
+.b3{width:100px;height:100px;bottom:60px;left:-15px;opacity:.3;animation:bubbleFloat 4.5s ease-in-out .5s infinite}
+.b4{width:70px;height:70px;bottom:30px;right:-10px;opacity:.35;animation:bubbleFloat 3.8s ease-in-out 1.5s infinite}
+
+.spark{position:absolute;border-radius:50%;background:#FF9800}
+.s1{width:10px;height:10px;top:160px;left:50px;animation:sparkle 2s ease-in-out infinite}
+.s2{width:8px;height:8px;top:250px;right:40px;animation:sparkle 2.5s ease-in-out .8s infinite}
+.s3{width:6px;height:6px;bottom:200px;left:30px;animation:sparkle 2s ease-in-out 1.2s infinite}
+.s4{width:9px;height:9px;bottom:160px;right:50px;animation:sparkle 2.2s ease-in-out .4s infinite}
+.s5{width:5px;height:5px;top:100px;left:130px;background:#FFF9C4;animation:sparkle 3s ease-in-out .6s infinite}
+.s6{width:7px;height:7px;bottom:240px;right:100px;background:#FFF9C4;animation:sparkle 2.8s ease-in-out 1s infinite}
+
+.logo-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);display:flex;flex-direction:column;align-items:center}
+.sprout{position:relative;width:60px;height:140px;animation:float 3s ease-in-out 2.5s infinite}
+.stem{position:absolute;bottom:0;left:50%;width:3.5px;height:100px;background:#C8E6C9;border-radius:2px;transform-origin:bottom center;animation:growUp .8s ease-out .3s both;margin-left:-1.75px}
+.leaf-r{position:absolute;top:8px;left:26px;width:40px;height:24px;background:#A5D6A7;border-radius:50%;transform-origin:left center;animation:leafR .5s ease-out 1.1s both}
+.leaf-l{position:absolute;top:35px;left:-6px;width:34px;height:20px;background:#81C784;border-radius:50%;transform-origin:right center;animation:leafL .5s ease-out 1.4s both}
+.seed{position:absolute;top:-2px;left:32px;width:14px;height:14px;background:#FF9800;border-radius:50%;animation:popIn .4s ease-out 1.6s both}
+.dirt{display:flex;gap:4px;position:absolute;bottom:-4px;left:50%;transform:translateX(-50%)}
+.dirt span{display:block;border-radius:50%;background:#C8E6C9;animation:popIn .3s ease-out both}
+.d1{width:8px;height:8px;opacity:.5;animation-delay:2s}
+.d2{width:6px;height:6px;opacity:.3;animation-delay:2.1s}
+.d3{width:6px;height:6px;opacity:.4;animation-delay:2.2s}
+
+.brand{font-family:var(--font-sans);font-size:38px;font-weight:500;color:#fff;margin-top:16px;animation:fadeUp .6s ease-out 1.8s both}
+.tagline{font-family:var(--font-sans);font-size:11px;color:#C8E6C9;letter-spacing:2.5px;margin-top:6px;animation:fadeUp .6s ease-out 2.1s both}
+
+.dots{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
+.dots span{width:8px;height:8px;background:#fff;border-radius:50%;animation:pulse 1.2s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+</style>
+
+<div class="phone-bg b1"></div>
+<div class="phone-bg b2"></div>
+<div class="phone-bg b3"></div>
+<div class="phone-bg b4"></div>
+
+<div class="spark s1"></div>
+<div class="spark s2"></div>
+<div class="spark s3"></div>
+<div class="spark s4"></div>
+<div class="spark s5"></div>
+<div class="spark s6"></div>
+
+<div class="logo-wrap">
+<div class="sprout">
+<div class="stem"></div>
+<div class="leaf-r"></div>
+<div class="leaf-l"></div>
+<div class="seed"></div>
+<div class="dirt"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+</div>
+<div class="brand">sproutly</div>
+<div class="tagline">PRESCHOOL MANAGEMENT</div>
+</div>
+
+<div class="dots"><span></span><span></span><span></span></div>
+
+</div>
+</div>

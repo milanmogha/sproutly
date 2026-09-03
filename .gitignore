@@ -1,0 +1,39 @@
+# Dependencies and build output — every workspace, wherever it sits.
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+
+# Secrets. Only the .example files belong in the repo.
+.env
+.env.*
+!.env.example
+
+# Flutter / Dart (App/)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+App/build/
+App/android/.gradle/
+App/android/app/debug/
+App/android/app/profile/
+App/android/app/release/
+App/ios/Pods/
+App/ios/.symlinks/
+
+# Runtime artefacts
+uploads/
+*.log
+*.tsbuildinfo
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local tooling scratch
+.commandcode/

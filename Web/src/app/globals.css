@@ -1,0 +1,239 @@
+@import 'tailwindcss';
+
+/*
+ * Sproutly design tokens — the web counterpart of the app's `app_theme.dart`.
+ *
+ * Design language: joyful maximalism. A Sproutly-green anchor with bold,
+ * saturated accents (grape, coral, gold, aqua, pink), chunky rounded shapes, a
+ * playful rounded display face (Fredoka) and layered colourful surfaces. Every
+ * screen inherits from here, so the whole app shifts together.
+ *
+ * Values are kept numerically identical to the Dart tokens so the web and the
+ * mobile app are the same product, not two lookalikes.
+ */
+
+@theme {
+  /* ── Neutrals ───────────────────────────────────────────────── */
+  --color-canvas: #e9f2e1; /* soft green pastel page */
+  --color-surface: #ffffff;
+  --color-hairline: #e2e7dd;
+  --color-ink: #1b201b; /* dark card / pill-nav surface */
+  --color-on-ink: #f2f6ee;
+  --color-text: #1a201a;
+  --color-text-muted: #6b756b;
+
+  /* ── Sproutly brand ─────────────────────────────────────────── */
+  --color-brand: #2e7d32; /* THE anchor */
+  --color-brand-deep: #1b5e20;
+  --color-brand-light: #66bb6a;
+  --color-brand-bright: #57c15a;
+
+  /* ── Loud accents ───────────────────────────────────────────── */
+  --color-grape: #7c3aed;
+  --color-purple: #8b3dff;
+  --color-coral: #ff6b3d;
+  --color-gold: #ffc21c;
+  --color-pink: #ff4d8d;
+  --color-blue: #2b8af0;
+  --color-teal: #00bfa6;
+  --color-mint: #00c9a7;
+  --color-lime: #8bd450;
+  --color-sky: #38bdf8;
+  --color-sunny: #ffb020;
+
+  /* ── Semantic ───────────────────────────────────────────────── */
+  --color-success: #22c77e;
+  --color-warning: #ffc21c;
+  --color-danger: #ff3b6b;
+  --color-info: #2b8af0;
+
+  /* ── Role accents ───────────────────────────────────────────── */
+  --color-parent: #7c3aed; /* grape */
+  --color-parent-tint: #f1e7fe;
+  --color-teacher: #00bfa6; /* aqua */
+  --color-teacher-tint: #dbf6f1;
+  --color-admin: #2e7d32; /* the green anchor */
+  --color-admin-tint: #e3f3e4;
+  --color-super: #ff6b3d; /* coral */
+  --color-super-tint: #ffeadf;
+
+  /* ── Chunky, friendly corners (mirrors AppRadii) ────────────── */
+  --radius-card: 26px;
+  --radius-button: 18px;
+  --radius-input: 16px;
+  --radius-sheet: 32px;
+  --radius-nav: 34px;
+
+  /* ── Type ───────────────────────────────────────────────────── */
+  --font-display: 'Fredoka', ui-rounded, 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Elevation (mirrors AppShadows) ─────────────────────────── */
+  --shadow-card: 0 10px 30px rgb(0 0 0 / 0.08), 0 2px 6px rgb(0 0 0 / 0.04);
+  --shadow-nav: 0 -2px 22px rgb(0 0 0 / 0.07);
+  --shadow-sheet: 0 -10px 44px rgb(0 0 0 / 0.14);
+}
+
+/*
+ * The active role tints the whole portal. `RoleShell` sets `data-role` on its
+ * wrapper *and* on <html>, and everything reads `--accent` — so one attribute
+ * re-skins every card, button and nav item, including dialogs and toasts that
+ * portal to document.body and would otherwise fall outside the portal's tree.
+ *
+ * The `:root` default is declared FIRST on purpose: `:root` and `[data-role]`
+ * have equal specificity, so source order decides, and the role must win when
+ * both land on <html>.
+ */
+:root {
+  --accent: var(--color-brand);
+  --accent-tint: var(--color-admin-tint);
+}
+
+[data-role='parent'] {
+  --accent: var(--color-parent);
+  --accent-tint: var(--color-parent-tint);
+}
+[data-role='teacher'] {
+  --accent: var(--color-teacher);
+  --accent-tint: var(--color-teacher-tint);
+}
+[data-role='admin'] {
+  --accent: var(--color-admin);
+  --accent-tint: var(--color-admin-tint);
+}
+[data-role='super_admin'] {
+  --accent: var(--color-super);
+  --accent-tint: var(--color-super-tint);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-weight: 500;
+    /* Room for the mobile bottom nav; cleared at `md` where the sidebar takes
+       over. Set here rather than per-screen so no page can forget it. */
+    overscroll-behavior-y: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  /* Inputs inherit the body face rather than the browser's default. */
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* A visible, on-brand focus ring everywhere — keyboard users included. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* The signature hero fill: green → mint. */
+  .bg-hero {
+    background-image: linear-gradient(135deg, var(--color-brand), var(--color-mint));
+  }
+
+  /* The warmer playful gradient: coral → gold. */
+  .bg-sunset {
+    background-image: linear-gradient(135deg, var(--color-coral), var(--color-gold));
+  }
+
+  .bg-accent {
+    background-color: var(--accent);
+  }
+  .bg-accent-tint {
+    background-color: var(--accent-tint);
+  }
+  .text-accent {
+    color: var(--accent);
+  }
+  .border-accent {
+    border-color: var(--accent);
+  }
+  .ring-accent {
+    --tw-ring-color: var(--accent);
+  }
+
+  /* Soft-UI surface used across the parent/admin portals. */
+  .neu {
+    background: #fff;
+    box-shadow:
+      -4px -4px 10px rgb(255 255 255 / 0.94),
+      5px 5px 14px rgb(46 125 50 / 0.1);
+  }
+
+  /* Horizontal scroll container for wide tables — the page itself must never
+     scroll sideways. */
+  .scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /*
+   * Lets grid and flex children shrink below their intrinsic content width.
+   *
+   * Items default to `min-width: auto`, so one long unbreakable word pushes a
+   * track wider than its container and the whole page scrolls sideways. Apply
+   * to a container whose children should always fit — `.scroll-x` opts a
+   * specific child back into scrolling.
+   */
+  .fit-children > * {
+    min-width: 0;
+  }
+
+  /* Hides scrollbars on the chip/tab rails without disabling scrolling. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*
+   * Keeps content clear of a phone's home indicator.
+   *
+   * The inset is ADDED to `--safe-pad` rather than assigned straight to
+   * `padding-bottom`. This rule is emitted after Tailwind's utilities, so a
+   * bare `padding-bottom` here silently beat any `py-*` on the same element —
+   * and since the inset is `0px` on every desktop, that flattened the padding
+   * to nothing. It is why modal footers had their buttons flush against the
+   * bottom edge.
+   *
+   * Set the base with `[--safe-pad:1rem]` alongside it; leave it out and this
+   * behaves as before, contributing only the inset.
+   */
+  .safe-bottom {
+    padding-bottom: calc(var(--safe-pad, 0px) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Respect a reduced-motion preference: the splash and page transitions are
+   decorative, and nobody should be made queasy by them. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

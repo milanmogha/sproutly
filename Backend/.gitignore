@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+.env
+*.log
+uploads/
+.DS_Store
+
+# Firebase Admin service account — a private key that can send push to every
+# user of the app. Never commit it.
+firebase-service-account.json
+*-firebase-adminsdk-*.json
+
+# Local data dumps taken before destructive migrations
+fees-backup-*.json
